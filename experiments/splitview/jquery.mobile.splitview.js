@@ -507,6 +507,7 @@
         }
 
         if(event.orientation){
+          $('html').addClass(event.orientation);
           if(event.orientation == 'portrait'){
             popover();            
           } 
@@ -515,9 +516,11 @@
           } 
         }
         else if($window.width() < 768 && $window.width() > 480){
+          $('html').addClass('portrait');
           popover();
         }
         else if($window.width() > 768){
+          $('html').addClass('landscape');
           splitView();
         }
       };
