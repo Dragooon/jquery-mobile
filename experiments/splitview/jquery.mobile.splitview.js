@@ -94,6 +94,14 @@
           
       }
 
+      $activeClickedLink = null;
+      function removeActiveLinkClass( forceRemoval ) {
+         if( !!$activeClickedLink && ( !$activeClickedLink.closest( '.ui-page-active' ).length || forceRemoval ) ) {
+             $activeClickedLink.removeClass( $.mobile.activeBtnClass );
+        }
+        $activeClickedLink = null;
+      }
+
       //override _registerInternalEvents to bind to new methods below
       $.mobile._registerInternalEvents = function(){
         //DONE: bind form submit with this plugin
@@ -148,14 +156,6 @@
           );
           event.preventDefault();
         });
-
-        $activeClickedLink = null;
-        function removeActiveLinkClass( forceRemoval ) {
-          if( !!$activeClickedLink && ( !$activeClickedLink.closest( '.ui-page-active' ).length || forceRemoval ) ) {
-              $activeClickedLink.removeClass( $.mobile.activeBtnClass );
-          }
-          $activeClickedLink = null;
-        }
 
         //add active state on vclick
         $( document ).bind( "vclick", function( event ) {
@@ -279,7 +279,8 @@
             //use default click handling
             return;
           }
-          removeAciveLinkClass( true );
+
+          httpCleanup();
 
           //use ajax
           var transitionVal = $link.jqmData( "transition" ),
