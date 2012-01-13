@@ -149,13 +149,35 @@
           event.preventDefault();
         });
 
+        $activeClickedLink = null;
+        function removeActiveLinkClass( forceRemoval ) {
+          if( !!$activeClickedLink && ( !$activeClickedLink.closest( '.ui-page-active' ).length || forceRemoval ) ) {
+              $activeClickedLink.removeClass( $.mobile.activeBtnClass );
+          }
+          $activeClickedLink = null;
+        }
+
         //add active state on vclick
         $( document ).bind( "vclick", function( event ) {
-          var link = findClosestLink( event.target );
+          // if this isn't a left click we don't care. Its important to note
+          // that when the virtual event is generated it will create
+          if ( event.which > 1 || !$.mobile.linkBindingEnabled ){
+            return;
+          }
+
+          var link = findClosestLink( event.target ),
+              path = $.mobile.path;
           if ( link ) {
-            if ( $.mobile.path.parseUrl( link.getAttribute( "href" ) || "#" ).hash !== "#" ) {
-              $( link ).closest( ".ui-btn" ).not( ".ui-disabled" ).addClass( $.mobile.activeBtnClass );
+            if ( path.parseUrl( link.getAttribute( "href" ) || "#" ).hash !== "#" ) {
+              removeActiveLinkClass( true );
+              $activeClickedLink = $( link ).closest( ".ui-btn" ).not( ".ui-disabled" );
+              $activeClickedLink.addClass( $.mobile.activeBtnClass );
               $( "." + $.mobile.activePageClass + " .ui-btn" ).not( link ).blur();
+                            
+              // By caching the href value to data and switching the href to a #, we can avoid address bar showing in iOS. The click handler resets the href during its initial steps if this data is present
+              $( link )
+               .jqmData( "href", $( link  ).attr( "href" )  )
+               .attr( "href", "#" );
             }
           }
         });
@@ -173,6 +195,11 @@
               httpCleanup = function(){
                 window.setTimeout( function() { removeActiveLinkClass( true ); }, 200 );
               };
+
+          // If there's data cached for the real href value, set the link's href back to it again. This pairs with an address bar workaround from the vclick handler  
+          if( $link.jqmData( "href" ) ){
+            $link.attr( "href", $link.jqmData( "href" ) );
+          }
 
           //if there's a data-rel=back attr, go back in history
           if( $link.is( ":jqmData(rel='back')" ) ) {
