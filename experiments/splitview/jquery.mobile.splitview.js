@@ -279,6 +279,7 @@
             //use default click handling
             return;
           }
+          removeAciveLinkClass( true );
 
           //use ajax
           var transitionVal = $link.jqmData( "transition" ),
