@@ -1,7 +1,11 @@
-/*
-* support tests
-*/
+//>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
+//>>description: Assorted support tests.
+//>>label: Support Tests
 
+// For test purposes we can't use anonymous module here otherwise
+// the tests will throw http://requirejs.org/docs/errors.html#mismatch
+define( "jquery.mobile.support", [  "jquery", "jquery.mobile.media" ], function( $ ) {
+//>>excludeEnd("jqmBuildExclude");
 (function( $, undefined ) {
 
 var fakeBody = $( "<body>" ).prependTo( "html" ),
@@ -21,6 +25,16 @@ function propExists( prop ) {
 			return true;
 		}
 	}
+}
+
+// Thanks to Modernizr src for this test idea
+function transform3dTest() {
+	var prop = "transform-3d";
+	
+	fakeBody[ 0 ].setAttribute('style', '-moz-perspective: 100px');
+	// Android 2.3 (at least) returns a positive for 3D-specific properties—`perspective`, `perspective-origin`, `backface-visibility`—necessitating the preceeding approach to pass FF10+.
+	// We should continue to look at ways to include other platforms as 3D support improves. IE10, for example.
+	return fakeBody[ 0 ].style.MozPerspective !== undefined || $.mobile.media( "(-" + vendors.join( "-" + prop + "),(-" ) + "-" + prop + "),(" + prop + ")" );
 }
 
 // Test for dynamic-updating base tag support ( allows us to avoid href,src attr rewriting )
@@ -50,7 +64,7 @@ function baseTagTest() {
 
 // non-UA-based IE version check by James Padolsey, modified by jdalton - from http://gist.github.com/527683
 // allows for inclusion of IE 6+, including Windows Mobile 7
-$.mobile.browser = {};
+$.extend( $.mobile, { browser: {} } );
 $.mobile.browser.ie = (function() {
 	var v = 3,
 	div = document.createElement( "div" ),
@@ -67,11 +81,16 @@ $.mobile.browser.ie = (function() {
 $.extend( $.support, {
 	orientation: "orientation" in window && "onorientationchange" in window,
 	touch: "ontouchend" in document,
-	cssTransitions: "WebKitTransitionEvent" in window,
+	cssTransitions: "WebKitTransitionEvent" in window || (function() {
+		var div = document.createElement( "div" );
+		div.setAttribute('style', '-moz-transition: height 100ms linear');	
+		return !!div.style.MozTransition;
+	})(),
 	pushState: "pushState" in history && "replaceState" in history,
 	mediaquery: $.mobile.media( "only all" ),
 	cssPseudoElement: !!propExists( "content" ),
 	touchOverflow: !!propExists( "overflowScrolling" ),
+	cssTransform3d: transform3dTest(),
 	boxShadow: !!propExists( "boxShadow" ) && !bb,
 	scrollTop: ( "pageXOffset" in window || "scrollTop" in document.documentElement || "scrollTop" in fakeBody[ 0 ] ) && !webos && !operamini,
 	dynamicBaseTag: baseTagTest()
@@ -118,3 +137,6 @@ if ( !$.support.boxShadow ) {
 }
 
 })( jQuery );
+//>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
+});
+//>>excludeEnd("jqmBuildExclude");

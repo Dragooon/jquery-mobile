@@ -2,6 +2,9 @@
 * "fixHeaderFooter" plugin - on-demand positioning for headers,footers
 */
 
+//>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
+define( [ "jquery", "jquery.mobile.core", "jquery.mobile.vmouse" ], function( $ ) {
+//>>excludeEnd("jqmBuildExclude");
 (function( $, undefined ) {
 
 var slideDownClass = "ui-header-fixed ui-fixed-inline fade",
@@ -198,7 +201,7 @@ $.mobile.fixedToolbars = (function() {
 			top = ele.offsetTop;
 
 			while ( ele && ele != body ) {
-				top += ele.scrollTop || 0;
+				top -= ele.scrollTop || 0;
 
 				if ( ele == op ) {
 					top += op.offsetTop;
@@ -374,3 +377,6 @@ $( document ).bind( "pagecreate create", function( event ) {
 });
 
 })( jQuery );
+//>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
+});
+//>>excludeEnd("jqmBuildExclude");
