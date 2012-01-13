@@ -785,7 +785,29 @@ define( [
 
 					//workaround to allow scripts to execute when included in page divs
 					all.get( 0 ).innerHTML = html;
-					page = all.find( ":jqmData(role='page'), :jqmData(role='dialog')" ).first();
+
+                    // Dragooon's hack
+					if (typeof settings.pageContainer != 'undefined' && $.support.splitview)
+						panel = all.find(":jqmData(id='" + settings.pageContainer.jqmData('id') + "')");
+
+					if (typeof panel != 'undefined' && panel.size() > 0)
+						to = panel.find( ":jqmData(role='page'), :jqmData(role='dialog')" ).first();
+					else
+					{
+						to = all.find( ":jqmData(role='page'), :jqmData(role='dialog')" ).first();
+						if (to.jqmData('sidepanel-enabled') == false)
+							to = all.find(":jqmData(id='main')").first().find(":jqmData(role='page'), :jqmData(role='dialog')").first();
+					}
+                    
+                    // Also append the missing dialoges
+                    all.find(":jqmData(rel='popup')").each(function()
+                    {
+                        $('#' + $(this).attr('id')).remove();
+                        $('body').append($(this));
+                        $(this).page();
+                    });
+
+					page = to;
 
 					//if page elem couldn't be found, create one and insert the body element's contents
 					if( !page.length ){
