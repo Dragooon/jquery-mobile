@@ -804,7 +804,7 @@ define( [
                     {
                         $('#' + $(this).attr('id')).remove();
                         $('body').append($(this));
-                        $(this).page();
+                        $(this).popup_dialog();
                     });
 
 					page = to;
