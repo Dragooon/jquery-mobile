@@ -86,6 +86,8 @@ define( [ "jquery", "jquery.mobile.core", "jquery.mobile.navigation", "jquery.mo
 		initializePage: function() {
 			// find present pages
 			var $dialogs, $pages = $( ":jqmData(role='page')" );
+			if (!$.support.splitview)
+				$pages = $(":jqmData(role='page'):jqmData(sidepanel-enabled!=false)");
 
 			// if no pages are found, check for dialogs or create one with body's inner html
 			if ( !$pages.length ) {
