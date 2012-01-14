@@ -1,6 +1,14 @@
 # The files to include when compiling the CSS files
 CSSFILES = css/structure/jquery.mobile.core.css \
 	css/structure/jquery.mobile.transitions.css \
+	css/structure/jquery.mobile.transitions.fade.css \
+	css/structure/jquery.mobile.transitions.pop.css \
+	css/structure/jquery.mobile.transitions.slide.css \
+	css/structure/jquery.mobile.transitions.slidedown.css \
+	css/structure/jquery.mobile.transitions.slideup.css \
+	css/structure/jquery.mobile.transitions.flip.css \
+	css/structure/jquery.mobile.transitions.turn.css \
+	css/structure/jquery.mobile.transitions.flow.css \
 	css/structure/jquery.mobile.grids.css \
 	css/structure/jquery.mobile.headerfooter.css \
 	css/structure/jquery.mobile.navbar.css \
@@ -55,7 +63,7 @@ css: init
 	@@java -XX:ReservedCodeCacheSize=64m \
 		-classpath build/js.jar:build/google-compiler-20111003.jar org.mozilla.javascript.tools.shell.Main \
 		external/r.js/dist/r.js \
-		-o cssIn=css/themes/default/jquery.mobile.css \
+		-o cssIn=${CSSTHEMEFILES} \
 		out=${OUTPUT}/${NAME}.compiled.css
 	@@cat LICENSE-INFO.txt | ${VER} > ${OUTPUT}/${NAME}.css
 	@@cat ${OUTPUT}/${NAME}.compiled.css >> ${OUTPUT}/${NAME}.css
