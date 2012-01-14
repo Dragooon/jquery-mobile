@@ -203,7 +203,7 @@
 
           //if there's a data-rel=back attr, go back in history
           if( $link.is( ":jqmData(rel='back')" ) ) {
-            window.history.back();
+            $.mobile.back($link);
             return false;
           }
 
@@ -374,7 +374,7 @@
               //the current dialog
               $.mobile.urlHistory.directHashChange({
                 currentUrl: to,
-                isBack: function() { window.history.back(); },
+                isBack: function() { $.mobile.back(); },
                 isForward: function() { window.history.forward(); }
               });
 
