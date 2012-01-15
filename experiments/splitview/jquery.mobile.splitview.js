@@ -466,7 +466,7 @@
         function popover(){
           $menu.addClass('panel-popover')
                .removeClass('ui-panel-left')
-               .css({'width':'25%', 'min-width':'250px', 'display':''});     
+               .css({'width':'30%', 'min-width':'250px', 'display':''});     
           if(!$menu.children('.popover_triangle').length){ 
             $menu.prepend('<div class="popover_triangle"></div>'); 
           }
@@ -487,7 +487,7 @@
         function splitView(){
           $menu.removeClass('panel-popover')
                .addClass('ui-panel-left')
-               .css({'width':'25%', 'min-width':'250px', 'display':''});
+               .css({'width':'30%', 'min-width':'250px', 'display':''});
           $menu.children('.popover_triangle').remove();
           $main.addClass('ui-panel-right')
                .width(function(){
