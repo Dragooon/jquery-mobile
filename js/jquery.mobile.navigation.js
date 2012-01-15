@@ -802,7 +802,8 @@ define( [
                     // Also append the missing dialoges
                     all.find(":jqmData(rel='popup')").each(function()
                     {
-                        $('#' + $(this).attr('id')).remove();
+                    	if ($('#' + $(this).attr('id')).size() > 0)
+                        	return true;
                         $('body').append($(this));
                         $(this).popup_dialog();
                     });
