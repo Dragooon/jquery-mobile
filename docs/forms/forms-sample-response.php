@@ -17,7 +17,8 @@
 
 		<div data-role="header" data-theme="e">
 		<h1>Sample form response</h1>
-		<a href="../../" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-home">Home</a>
+		<a href="../../" data-icon="home" data-iconpos="notext" data-direction="reverse">Home</a>
+		<a href="../nav.html" data-icon="search" data-iconpos="notext" data-rel="dialog" data-transition="fade">Search</a>
 	</div><!-- /header -->
 
 	<div data-role="content" data-theme="c">
@@ -71,7 +72,7 @@
 </div><!-- /content -->
 
 <div data-role="footer" class="footer-docs" data-theme="c">
-		<p>&copy; 2011 The jQuery Project</p>
+		<p>&copy; 2011-12 The jQuery Project</p>
 </div>
 	
 </div><!-- /page -->

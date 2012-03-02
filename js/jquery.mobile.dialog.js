@@ -2,7 +2,7 @@
 //>>description: Degrades inputs to another type after custom enhancements are made.
 //>>label: Dialog-style Pages
 
-define( [ "jquery", "jquery.mobile.widget" ], function( $ ) {
+define( [ "jquery", "./jquery.mobile.widget" ], function( $ ) {
 //>>excludeEnd("jqmBuildExclude");
 (function( $, window, undefined ) {
 
@@ -18,28 +18,32 @@ $.widget( "mobile.dialog", $.mobile.widget, {
 			headerCloseButton = $( "<a href='#' data-" + $.mobile.ns + "icon='delete' data-" + $.mobile.ns + "iconpos='notext'>"+ this.options.closeBtnText + "</a>" ),
 			dialogWrap = $("<div/>", {
 					"role" : "dialog",
-					"class" : "ui-dialog ui-corner-all ui-overlay-shadow"
+					"class" : "ui-dialog-contain ui-corner-all ui-overlay-shadow"
 				});
 
-		$el.addClass( "ui-dialog-page ui-overlay-" + this.options.overlayTheme );
+		$el.addClass( "ui-dialog ui-overlay-" + this.options.overlayTheme );
 		
 		// Class the markup for dialog styling
 		// Set aria role
 		$el
 			.wrapInner( dialogWrap )
-			.find( ":jqmData(role='header')" )
-				.prepend( headerCloseButton )
-			.end()
-			.find(':first-child')
-				.addClass( "ui-corner-top" )
-			.end()
-			.find( ":last-child" )
-				.addClass( "ui-corner-bottom" );
+			.children()
+				.find( ":jqmData(role='header')" )
+					.prepend( headerCloseButton )
+				.end()
+				.children( ':first-child')
+					.addClass( "ui-corner-top" )
+				.end()
+				.children( ":last-child" )
+					.addClass( "ui-corner-bottom" );
 
 		// this must be an anonymous function so that select menu dialogs can replace
 		// the close method. This is a change from previously just defining data-rel=back
 		// on the button and letting nav handle it
-		headerCloseButton.bind( "vclick", function() {
+		//
+		// Use click rather than vclick in order to prevent the possibility of unintentionally
+		// reopening the dialog if the dialog opening item was directly under the close button.
+		headerCloseButton.bind( "click", function() {
 			self.close();
 		});
 
@@ -66,7 +70,7 @@ $.widget( "mobile.dialog", $.mobile.widget, {
 			// if there's an overlay theme, we're going to remove it from the page container.
 			// First though, check that the incoming page isn't a dialog with the same theme. If so, don't remove.
 			if( self.options.overlayTheme ){
-				if( !ui.nextPage || !ui.nextPage.is( ".ui-dialog-page.ui-overlay-" + self.options.overlayTheme ) ){
+				if( !ui.nextPage || !ui.nextPage.is( ".ui-dialog.ui-overlay-" + self.options.overlayTheme ) ){
 					$.mobile.pageContainer.removeClass( "ui-overlay-" + self.options.overlayTheme );
 				}	
 			}
@@ -86,7 +90,7 @@ $.widget( "mobile.dialog", $.mobile.widget, {
 
 //auto self-init widgets
 $( document ).delegate( $.mobile.dialog.prototype.options.initSelector, "pagecreate", function(){
-	$( this ).dialog();
+	$.mobile.dialog.prototype.enhance( this );
 });
 
 })( jQuery, this );
