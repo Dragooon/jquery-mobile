@@ -5,7 +5,7 @@
     if($.support.touch){
       $('html').addClass('touch');
     }
-    var $query = $.mobile.media('screen and (min-width: 480px)') && ($.mobile.media('(-webkit-max-device-pixel-ratio: 1.2)') || $.mobile.media('max--moz-device-pixel-ratio: 1.2)'));
+    var $query = $.mobile.media('screen and (min-width: 480px)') && ($.mobile.media('(-webkit-max-device-pixel-ratio: 1.2)') || $.mobile.media('(max--moz-device-pixel-ratio: 1.2)'));
     $.support.splitview = ($query || ($.mobile.browser.ie && $(this).width() >= 480)) && $.mobile.ajaxEnabled;
     if ($.support.splitview) {
       $('html').addClass('splitview');
@@ -466,7 +466,7 @@
         function popover(){
           $menu.addClass('panel-popover')
                .removeClass('ui-panel-left')
-               .css({'width':'30%', 'min-width':'250px', 'display':''});     
+               .css({'width':'30%', 'min-width':'250px', 'display':'', 'overflow-x':'visible'});     
           if(!$menu.children('.popover_triangle').length){ 
             $menu.prepend('<div class="popover_triangle"></div>'); 
           }
@@ -553,14 +553,14 @@
 
       //DONE: pageshow binding for scrollview - now using IScroll4! hell yeah!
       $('div:jqmData(role="page")').live('pagebeforeshow.scroll', function(event, ui){
-        if ($.support.touch) {
+        if ($.support.touch && !$.support.touchOverflow) {
 
           var $page = $(this),
               $scrollArea = $page.find('div:jqmData(role="content")');
               $scrAreaChildren = $scrollArea.children();
 
           if ($scrAreaChildren.length > 1) {
-            $scrAreaChildren = $scrollArea.wrapInner("<div></div>").children();
+            $scrAreaChildren = $scrollArea.wrapInner("<div class='scrollable vertical'></div>").children();
           }
           $scrollArea.css({ 'width':'auto',
                             'height':'auto',
@@ -609,7 +609,7 @@
 
       //data-context handler - a page with a link that has a data-context attribute will load that page after this page loads
       //this still needs work - pageTransitionQueue messes everything up.
-      $('div:jqmData(role="panel")').live('changepage.context', function(){
+      $('div:jqmData(role="panel")').live('pagechange.context', function(){
         var $this=$(this),
             $currPanelActivePage = $this.children('.' + $.mobile.activePageClass),
             panelContextSelector = $this.jqmData('context'),
@@ -637,7 +637,7 @@
             $footer=$this.children(':jqmData(role="footer")'),
             thisHeaderHeight=$header.css('display') == 'none' ? 0 : $header.outerHeight(),
             thisFooterHeight=$footer.css('display') == 'none' ? 0 : $footer.outerHeight();
-        $this.children(':jqmData(role="content")').css({'top':thisHeaderHeight, 'bottom':thisFooterHeight});
+        // $this.children(':jqmData(role="content")').css({'top':thisHeaderHeight, 'bottom':thisFooterHeight});
       })
 
       //this allows panels to change their widths upon changepage - useful for pages that need a different width than the ones provided. 
