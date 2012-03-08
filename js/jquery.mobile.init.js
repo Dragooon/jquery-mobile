@@ -102,17 +102,11 @@ define( [ "jquery", "./jquery.mobile.core", "./jquery.mobile.support", "./jquery
 		// find and enhance the pages in the dom and transition to the first page.
 		initializePage: function() {
 			// find present pages
-<<<<<<< HEAD
 			var $dialogs, $pages = $( ":jqmData(role='page'), :jqmData(role='dialog')" );
 			if (!$.support.splitview)
 				$pages = $(":jqmData(role='page'):jqmData(sidepanel-enabled!=false), :jqmData(role='dialog'):jqmData(sidepanel-enabled!=false)");
 
 			// if no pages are found, check for dialogs or create one with body's inner html
-=======
-			var $pages = $( ":jqmData(role='page'), :jqmData(role='dialog')" );
-
-			// if no pages are found, create one with body's inner html
->>>>>>> 5e4c5c3ea2ac3eea245614728fd1deb97158efa8
 			if ( !$pages.length ) {
 				$pages = $( "body" ).wrapInner( "<div data-" + $.mobile.ns + "role='page'></div>" ).children( 0 );
 			}
