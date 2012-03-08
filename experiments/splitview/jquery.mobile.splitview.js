@@ -18,6 +18,7 @@
         if( !$.mobile.hashListeningEnabled || !$.mobile.path.stripHash( location.hash ) ){
           var $container=$('div:jqmData(id="main")');
           $.mobile.firstPage = firstPageMain;
+          $.mobile.pageContainer = $container;
           $.mobile.changePage(firstPageMain, {transition:'none', changeHash:false, pageContainer:$container});
           $.mobile.activePage=undefined;
         } //no need to trigger a hashchange here cause the other page is handled by core.
