@@ -104,7 +104,20 @@ define( [ "jquery", "./jquery.mobile.core", "./jquery.mobile.support", "./jquery
 			// find present pages
 			var $dialogs, $pages = $( ":jqmData(role='page'), :jqmData(role='dialog')" );
 			if (!$.support.splitview)
+			{
 				$pages = $(":jqmData(role='page'):jqmData(sidepanel-enabled!=false), :jqmData(role='dialog'):jqmData(sidepanel-enabled!=false)");
+				var inner;
+				$("div[data-role='header'] > select[data-select-menu=true]").each(function()
+				{
+					if (typeof inner == 'undefined')
+					{
+						inner = $(this).clone();
+						inner.find('optgroup').remove();
+					}
+					$(this).find('optgroup').insertBefore(inner.find('option:last'));
+				});
+				$("div[data-role='header'] > select[data-select-menu=true]").html(inner.html());
+			}
 
 			// if no pages are found, check for dialogs or create one with body's inner html
 			if ( !$pages.length ) {

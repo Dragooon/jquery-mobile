@@ -782,6 +782,20 @@ define( [
                     // Dragooon's hack
 					if (typeof settings.pageContainer != 'undefined' && $.support.splitview)
 						panel = all.find(":jqmData(id='" + settings.pageContainer.jqmData('id') + "')");
+					else if (!$.support.splitview)
+					{
+						var inner;
+						all.find("div[data-role='header'] > select[data-select-menu=true]").each(function()
+						{
+							if (typeof inner == 'undefined')
+							{
+								inner = $(this).clone();
+								inner.find('optgroup').remove();
+							}
+							$(this).find('optgroup').insertBefore(inner.find('option:last'));
+						});
+						all.find("div[data-role='header'] > select[data-select-menu=true]").html(inner.html());
+					}
 
 					if (typeof panel != 'undefined' && panel.size() > 0)
 						to = panel.find( ":jqmData(role='page'), :jqmData(role='dialog')" ).first();
