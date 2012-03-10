@@ -832,4 +832,25 @@
 			start
 		]);
 	});
+
+	asyncTest( "split list items respect the icon", function() {
+		$.testHelper.pageSequence([
+			function() {
+				$.mobile.changePage("#split-list-icon");
+			},
+
+			function() {
+				$.mobile.activePage.find("li").each(function(i, elem){
+					var $elem = $(elem),
+						order = [ "star", "plug", "delete", "plug" ];
+
+					same( $elem.find("span.ui-icon-" + order[i]).length, 1, "there should be one " + order[i] + " icon" );
+				});
+
+				window.history.back();
+			},
+
+			start
+		]);
+	});
 })(jQuery);
