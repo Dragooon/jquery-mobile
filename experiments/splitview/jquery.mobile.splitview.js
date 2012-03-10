@@ -1,6 +1,7 @@
 // TODO: reinstate replaceBackBtn - to include the case where people actually really want the back btn
 (function($,window,undefined){
   $( window.document ).bind('mobileinit', function(){
+    $.support.splitview = smf4mobile.splitview;
     //some class for css to detect touchscreens
     if($.support.touch){
       $('html').addClass('touch');
