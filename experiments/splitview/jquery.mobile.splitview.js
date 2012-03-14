@@ -559,7 +559,7 @@
 
       //DONE: pageshow binding for scrollview - now using IScroll4! hell yeah!
       $('div:jqmData(role="page")').live('pagebeforeshow.scroll', function(event, ui){
-        if ($.support.touch && !$.support.touchOverflow) {
+        if ($.support.touch) {
 
           var $page = $(this),
               $scrollArea = $page.find('div:jqmData(role="content")');
