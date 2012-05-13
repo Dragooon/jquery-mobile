@@ -16,6 +16,8 @@
       $('html').addClass('splitview');
       //on window.ready() execution:
       $(function() {
+        // Load the loaderWidget beforehand since the actual event is fired after this event, and we need it.
+        $.mobile.loaderWidget = $.mobile.loaderWidget || $( $.mobile.loader.prototype.defaultHtml ).loader();
         $(document).unbind('.toolbar');
         $('.ui-page').die('.toolbar');
         $('div:jqmData(role="panel")').addClass('ui-mobile-viewport ui-panel');
@@ -111,10 +113,16 @@
       //override _registerInternalEvents to bind to new methods below
       $.mobile._registerInternalEvents = function(){
         //DONE: bind form submit with this plugin
-        $("form").live('submit', function(event){
+        $( document ).delegate( "form", "submit", function( event ) {
           var $this = $( this );
           if( !$.mobile.ajaxEnabled ||
-              $this.is( ":jqmData(ajax='false')" ) ){ return; }
+              // test that the form is, itself, ajax false
+              $this.is(":jqmData(ajax='false')") ||
+              // test that $.mobile.ignoreContentEnabled is set and
+              // the form or one of it's parents is ajax=false
+              !$this.jqmHijackable().length ) {
+            return;
+          }
 
           var type = $this.attr("method"),
               target = $this.attr("target"),
@@ -173,6 +181,12 @@
 
           var link = findClosestLink( event.target ),
               path = $.mobile.path;
+          // split from the previous return logic to avoid find closest where possible
+          // TODO teach $.mobile.hijackable to operate on raw dom elements so the link wrapping
+          // can be avoided
+          if ( !$(link).jqmHijackable().length ) {
+            return;
+          }
           if ( link ) {
             if ( path.parseUrl( link.getAttribute( "href" ) || "#" ).hash !== "#" ) {
               removeActiveLinkClass( true );
@@ -191,16 +205,18 @@
         //DONE: link click event binding for changePage
         //click routing - direct to HTTP or Ajax, accordingly
         $(document).bind( "click", function(event) {
-          var link = findClosestLink(event.target);
-          if (!link){
+          var link = findClosestLink( event.target ), $link = $( link ), httpCleanup;
+          // If there is no link associated with the click or its not a left
+          // click we want to ignore the click
+          // TODO teach $.mobile.hijackable to operate on raw dom elements so the link wrapping
+          // can be avoided
+          if ( !link || event.which > 1 || !$link.jqmHijackable().length ) {
             return;
           }
-
-          var $link = $(link),
-              //remove active link class if external (then it won't be there if you come back)
-              httpCleanup = function(){
-                window.setTimeout( function() { removeActiveLinkClass( true ); }, 200 );
-              };
+          //remove active link class if external (then it won't be there if you come back)
+          httpCleanup = function(){
+            window.setTimeout( function() { removeActiveLinkClass( true ); }, 200 );
+          };
 
           // If there's data cached for the real href value, set the link's href back to it again. This pairs with an address bar workaround from the vclick handler  
           if( $link.jqmData( "href" ) ){
@@ -328,7 +344,7 @@
 
         //prefetch pages when anchors with data-prefetch are encountered
         //TODO: insert pageContainer in here!
-        $( ".ui-page" ).live( "pageshow.prefetch", function(){
+        $( document ).delegate( ".ui-page", "pageshow.prefetch", function() {
           var urls = [],
               $thisPageContainer = $(this).parents('div:jqmData(role="panel")');
           $( this ).find( "a:jqmData(prefetch)" ).each(function(){
