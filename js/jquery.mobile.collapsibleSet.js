@@ -1,6 +1,7 @@
 //>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
 //>>description: For creating grouped collapsible content areas.
-//>>label: Collapsible Sets
+//>>label: Collapsible Sets (Accordions)
+//>>group: Widgets
 //>>css: ../css/themes/default/jquery.mobile.theme.css,../css/structure/jquery.mobile.collapsible.css
 
 define( [ "jquery", "./jquery.mobile.widget", "./jquery.mobile.collapsible" ], function( $ ) {
@@ -24,6 +25,10 @@ $.widget( "mobile.collapsibleset", $.mobile.widget, {
 			o.contentTheme = $el.jqmData( "content-theme" );
 		}
 
+		if ( !o.corners ) {
+			o.corners = $el.jqmData( "corners" ) === undefined ? true : false;
+		}
+
 		// Initialize the collapsible set if it's not already initialized
 		if ( !$el.jqmData( "collapsiblebound" ) ) {
 			$el
@@ -36,26 +41,38 @@ $.widget( "mobile.collapsibleset", $.mobile.widget, {
 					if ( contentTheme && collapsible.jqmData( "collapsible-last" ) ) {
 						collapsible.find( widget.options.heading ).first()
 							.find( "a" ).first()
-							.add( ".ui-btn-inner" )
+							.toggleClass( "ui-corner-bottom", isCollapse )
+							.find( ".ui-btn-inner" )
 							.toggleClass( "ui-corner-bottom", isCollapse );
 						collapsible.find( ".ui-collapsible-content" ).toggleClass( "ui-corner-bottom", !isCollapse );
 					}
 				})
 				.bind( "expand", function( event ) {
-					$( event.target )
-						.closest( ".ui-collapsible" )
-						.siblings( ".ui-collapsible" )
-						.trigger( "collapse" );
+					var closestCollapsible = $( event.target )
+						.closest( ".ui-collapsible" );
+					if( closestCollapsible.parent().is( ":jqmData(role='collapsible-set')" ) ) {
+						closestCollapsible
+							.siblings( ".ui-collapsible" )
+							.trigger( "collapse" );
+					}
 				});
 		}
 	},
 
 	_init: function() {
+		var $el = this.element,
+			collapsiblesInSet = $el.children( ":jqmData(role='collapsible')" ),
+			expanded = collapsiblesInSet.filter( ":jqmData(collapsed='false')" );
 		this.refresh();
+
+		// Because the corners are handled by the collapsible itself and the default state is collapsed
+		// That was causing https://github.com/jquery/jquery-mobile/issues/4116
+		expanded.trigger( "expand" );
 	},
 
 	refresh: function() {
 		var $el = this.element,
+			o = this.options,
 			collapsiblesInSet = $el.children( ":jqmData(role='collapsible')" );
 
 		$.mobile.collapsible.prototype.enhance( collapsiblesInSet.not( ".ui-collapsible" ) );
@@ -64,14 +81,15 @@ $.widget( "mobile.collapsibleset", $.mobile.widget, {
 		collapsiblesInSet.each( function() {
 			$( this ).find( $.mobile.collapsible.prototype.options.heading )
 				.find( "a" ).first()
-				.add( ".ui-btn-inner" )
+				.removeClass( "ui-corner-top ui-corner-bottom" )
+				.find( ".ui-btn-inner" )
 				.removeClass( "ui-corner-top ui-corner-bottom" );
 		});
 
 		collapsiblesInSet.first()
 			.find( "a" )
 				.first()
-				.addClass( "ui-corner-top" )
+				.addClass( o.corners ? "ui-corner-top" : "" )
 				.find( ".ui-btn-inner" )
 					.addClass( "ui-corner-top" );
 
@@ -79,7 +97,7 @@ $.widget( "mobile.collapsibleset", $.mobile.widget, {
 			.jqmData( "collapsible-last", true )
 			.find( "a" )
 				.first()
-				.addClass( "ui-corner-bottom" )
+				.addClass( o.corners ? "ui-corner-bottom" : "" )
 				.find( ".ui-btn-inner" )
 					.addClass( "ui-corner-bottom" );
 	}

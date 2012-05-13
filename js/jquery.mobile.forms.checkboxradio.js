@@ -4,8 +4,8 @@
 
 //>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
 //>>description: Consistent styling for checkboxes/radio buttons.
-//>>label: Checkboxes/Radio Buttons
-//>>group: forms
+//>>label: Checkboxes & Radio Buttons
+//>>group: Forms
 //>>css: ../css/themes/default/jquery.mobile.theme.css,../css/structure/jquery.mobile.forms.checkboxradio.css
 
 define( [ "jquery", "./jquery.mobile.core", "./jquery.mobile.widget", "./jquery.mobile.buttonMarkup" ], function( $ ) {
@@ -25,7 +25,8 @@ $.widget( "mobile.checkboxradio", $.mobile.widget, {
 			},
 			// NOTE: Windows Phone could not find the label through a selector
 			// filter works though.
-			label = $( input ).closest( "form,fieldset,:jqmData(role='page'),:jqmData(role='dialog')" ).find( "label" ).filter( "[for='" + input[0].id + "']" ),
+			parentLabel = $( input ).closest( "label" ),
+			label = parentLabel.length ? parentLabel : $( input ).closest( "form,fieldset,:jqmData(role='page'),:jqmData(role='dialog')" ).find( "label" ).filter( "[for='" + input[0].id + "']" ),
 			inputtype = input[0].type,
 			mini = inheritAttr( input, "mini" ),
 			checkedState = inputtype + "-on",
@@ -40,10 +41,6 @@ $.widget( "mobile.checkboxradio", $.mobile.widget, {
 
 		if ( inputtype !== "checkbox" && inputtype !== "radio" ) {
 			return;
-		}
-
-		if( !label.length ){
-			this.raise( inputtype + " inputs require a label for enhancement" );
 		}
 
 		// Expose for other methods
@@ -155,7 +152,7 @@ $.widget( "mobile.checkboxradio", $.mobile.widget, {
 			return this.element;
 		}
 
-		return this.element.closest( "form,fieldset,:jqmData(role='page')" )
+		return this.element.closest( "form,fieldset,:jqmData(role='page'),:jqmData(role='dialog')" )
 			.find( "input[name='"+ this.element[0].name +"'][type='"+ this.inputtype +"']" );
 	},
 

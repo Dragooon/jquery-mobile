@@ -1,12 +1,13 @@
 //>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
-//>>description: Formats groups of links as nav bars.
-//>>label: Navigation Bars
+//>>description: Applies the AJAX navigation system to links and forms to enable page transitions
+//>>label: AJAX Navigation System
+//>>group: Navigation
 
 define( [
 	"jquery",
 	"./jquery.mobile.core",
 	"./jquery.mobile.event",
-	"../external/requirejs/depend!./jquery.mobile.hashchange[jquery]",
+	"../external/requirejs/depend!./jquery.hashchange[jquery]",
 	"./jquery.mobile.page",
 	"./jquery.mobile.transition" ], function( $ ) {
 //>>excludeEnd("jqmBuildExclude");
@@ -389,15 +390,14 @@ define( [
 
 		if( pageTitle.length ) {
 			pageTitle.focus();
-		}
-		else{
+		} else{
 			page.focus();
 		}
-	}
+	};
 
 	//remove active classes after page transition or error
 	function removeActiveLinkClass( forceRemoval ) {
-		if( !!$activeClickedLink && ( !$activeClickedLink.closest( '.ui-page-active' ).length || forceRemoval ) ) {
+		if( !!$activeClickedLink && ( !$activeClickedLink.closest( "." + $.mobile.activePageClass ).length || forceRemoval ) ) {
 			$activeClickedLink.removeClass( $.mobile.activeBtnClass );
 		}
 		$activeClickedLink = null;
@@ -473,6 +473,11 @@ define( [
 	// bind to scrollstop for the first page as "pagechange" won't be fired in that case
 	$window.bind( "scrollstop", delayedSetLastScroll );
 
+	// No-op implementation of transition degradation
+	$.mobile._maybeDegradeTransition = $.mobile._maybeDegradeTransition || function( transition ) {
+		return transition;
+	};
+
 	//function for transitioning between two existing pages
 	function transitionPages( toPage, fromPage, transition, reverse ) {
 
@@ -486,6 +491,8 @@ define( [
 		//clear page loader
 		$.mobile.hidePageLoadingMsg();
 
+		transition = $.mobile._maybeDegradeTransition( transition );
+		
 		//find the transition handler for the specified transition. If there
 		//isn't one in our transitionHandlers dictionary, use the default one.
 		//call the handler immediately to kick-off the transition.
@@ -508,14 +515,9 @@ define( [
 
 	//simply set the active page's minimum height to screen height, depending on orientation
 	function getScreenHeight(){
-		var orientation 	= $.event.special.orientationchange.orientation(),
-			port			= orientation === "portrait",
-			winMin			= port ? 480 : 320,
-			screenHeight	= port ? screen.availHeight : screen.availWidth,
-			winHeight		= Math.max( winMin, $( window ).height() ),
-			pageMin			= Math.min( screenHeight, winHeight );
-
-		return pageMin;
+		// Native innerHeight returns more accurate value for this across platforms,
+		// jQuery version is here as a normalized fallback for platforms like Symbian
+		return window.innerHeight || $( window ).height();
 	}
 
 	$.mobile.getScreenHeight = getScreenHeight;
@@ -525,7 +527,7 @@ define( [
 		var aPage = $( "." + $.mobile.activePageClass ),
 			aPagePadT = parseFloat( aPage.css( "padding-top" ) ),
 			aPagePadB = parseFloat( aPage.css( "padding-bottom" ) );
-				
+
 		aPage.css( "min-height", getScreenHeight() - aPagePadT - aPagePadB );
 	}
 
@@ -668,7 +670,8 @@ define( [
 		// attribute and in need of enhancement.
 		if ( page.length === 0 && dataUrl && !path.isPath( dataUrl ) ) {
 			page = settings.pageContainer.children( "#" + dataUrl )
-				.attr( "data-" + $.mobile.ns + "url", dataUrl );
+				.attr( "data-" + $.mobile.ns + "url", dataUrl )
+				.jqmData( "url", dataUrl );
 		}
 
 		// If we failed to find a page in the DOM, check the URL to see if it
@@ -1040,6 +1043,16 @@ define( [
 		if( fromPage && fromPage[0] === toPage[0] && !settings.allowSamePageTransition ) {
 			isPageTransitioning = false;
 			mpc.trigger( "pagechange", triggerData );
+
+			// Even if there is no page change to be done, we should keep the urlHistory in sync with the hash changes
+			if( settings.fromHashChange ) {
+				urlHistory.directHashChange({
+					currentUrl:	url,
+					isBack:		function() {},
+					isForward:	function() {}
+				});
+			}
+
 			return;
 		}
 
@@ -1071,6 +1084,9 @@ define( [
 			}
 		} catch(e) {}
 
+		// Record whether we are at a place in history where a dialog used to be - if so, do not add a new history entry and do not change the hash either
+		var alreadyThere = false;
+
 		// If we're displaying the page as a dialog, we don't want the url
 		// for the dialog content to be used in the hash. Instead, we want
 		// to append the dialogHashKey to the url of the current page.
@@ -1079,6 +1095,17 @@ define( [
 			// be an empty string. Moving the undefined -> empty string back into
 			// urlHistory.addNew seemed imprudent given undefined better represents
 			// the url state
+
+			// If we are at a place in history that once belonged to a dialog, reuse
+			// this state without adding to urlHistory and without modifying the hash.
+			// However, if a dialog is already displayed at this point, and we're
+			// about to display another dialog, then we must add another hash and
+			// history entry on top so that one may navigate back to the original dialog
+			if ( active.url.indexOf( dialogHashKey ) > -1 && !$.mobile.activePage.is( ".ui-dialog" ) ) {
+				settings.changeHash = false;
+				alreadyThere = true;
+			}
+
 			url = ( active.url || "" ) + dialogHashKey;
 		}
 
@@ -1106,7 +1133,7 @@ define( [
 			|| ( isDialog ? $.mobile.defaultDialogTransition : $.mobile.defaultPageTransition );
 
 		//add page to history stack if it's not back or forward
-		if( !historyDir ) {
+		if( !historyDir && !alreadyThere ) {
 			urlHistory.addNew( url, settings.transition, pageTitle, pageUrl, settings.role );
 		}
 
@@ -1242,7 +1269,7 @@ define( [
 					type:		type && type.length && type.toLowerCase() || "get",
 					data:		$this.serialize(),
 					transition:	$this.jqmData( "transition" ),
-					direction:	$this.jqmData( "direction" ),
+					reverse:	$this.jqmData( "direction" ) === "reverse",
 					reloadPage:	true
 				}
 			);
@@ -1272,11 +1299,6 @@ define( [
 					$activeClickedLink = $( link ).closest( ".ui-btn" ).not( ".ui-disabled" );
 					$activeClickedLink.addClass( $.mobile.activeBtnClass );
 					$( "." + $.mobile.activePageClass + " .ui-btn" ).not( link ).blur();
-
-					// By caching the href value to data and switching the href to a #, we can avoid address bar showing in iOS. The click handler resets the href during its initial steps if this data is present
-					$( link )
-						.jqmData( "href", $( link  ).attr( "href" )  )
-						.attr( "href", "#" );
 				}
 			}
 		});
@@ -1301,11 +1323,6 @@ define( [
 			httpCleanup = function(){
 				window.setTimeout( function() { removeActiveLinkClass( true ); }, 200 );
 			};
-
-			// If there's data cached for the real href value, set the link's href back to it again. This pairs with an address bar workaround from the vclick handler
-			if( $link.jqmData( "href" ) ){
-				$link.attr( "href", $link.jqmData( "href" ) );
-			}
 
 			//if there's a data-rel=back attr, go back in history
 			if( $link.is( ":jqmData(rel='back')" ) ) {
@@ -1374,8 +1391,7 @@ define( [
 
 			//use ajax
 			var transition = $link.jqmData( "transition" ),
-				direction = $link.jqmData( "direction" ),
-				reverse = ( direction && direction === "reverse" ) ||
+				reverse = $link.jqmData( "direction" ) === "reverse" ||
 							// deprecated - remove by 1.0
 							$link.jqmData( "back" ),
 

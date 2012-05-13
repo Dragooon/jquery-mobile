@@ -1,6 +1,7 @@
 //>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
-//>>description: Adds a filtering textfield to listviews
-//>>label: Listview Filter
+//>>description: Applies listview styling of various types (standard, numbered, split button, etc.)
+//>>label: Listview
+//>>group: Widgets
 //>>css: ../css/themes/default/jquery.mobile.theme.css, ../css/structure/jquery.mobile.listview.css
 
 define( [ "jquery", "./jquery.mobile.widget", "./jquery.mobile.buttonMarkup", "./jquery.mobile.page", "./jquery.mobile.page.sections" ], function( $ ) {
@@ -29,10 +30,10 @@ $.widget( "mobile.listview", $.mobile.widget, {
 	_create: function() {
 		var t = this,
 			listviewClasses = "";
-			
+
 		listviewClasses += t.options.inset ? " ui-listview-inset ui-corner-all ui-shadow " : "";
 		listviewClasses += t.element.jqmData( "mini" ) || t.options.mini === true ? " ui-mini" : "";
-		
+
 		// create listview markup
 		t.element.addClass(function( i, orig ) {
 			return orig + " ui-listview " + listviewClasses;
@@ -234,7 +235,7 @@ $.widget( "mobile.listview", $.mobile.widget, {
 					}
 				} else if ( item.jqmData( "role" ) === "list-divider" ) {
 
-					itemClass += " ui-li-divider ui-btn ui-bar-" + dividertheme;
+					itemClass += " ui-li-divider ui-bar-" + dividertheme;
 					item.attr( "role", "heading" );
 
 					//reset counter when a divider heading is encountered
@@ -308,6 +309,9 @@ $.widget( "mobile.listview", $.mobile.widget, {
 		this._addThumbClasses( $list.find( ".ui-link-inherit" ) );
 
 		this._refreshCorners( create );
+
+    // autodividers binds to this to redraw dividers after the listview refresh
+		this._trigger( "afterrefresh" );
 	},
 
 	//create a string for ID/subpage url creation

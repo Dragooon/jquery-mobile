@@ -109,10 +109,13 @@ docs: init js css
 	@@cp -r compiled/images tmp/demos/css/themes/${THEME}
 	# ... replace "js/" with "js/jquery.mobile.js"
 	@@ # NOTE the deletion here is required by gnu/bsd sed differences
-	@@find tmp/demos -name "*.html" -exec sed -i${SED_INPLACE_EXT} -e 's@js/"@js/jquery.mobile.js"@' {} \;
+	@@find tmp/demos \( -name '*.html' -o -name '*.php' \) -exec sed -i${SED_INPLACE_EXT} -e 's@js/"@js/${NAME}.js"@' {} \;
+	@@find tmp/demos -name "*${SED_INPLACE_EXT}" -exec rm {} \;
+	@@ # make sure the docs reference the right css file names (for deploy)
+	@@find tmp/demos \( -name '*.html' -o -name '*.php' \) -exec sed -i${SED_INPLACE_EXT} -e 's@${BASE_NAME}.css"@${NAME}.css"@' {} \;
 	@@find tmp/demos -name "*${SED_INPLACE_EXT}" -exec rm {} \;
 	# ... Move and zip up the the whole folder
-	@@rm -f ${OUTPUT}/${NAME}.docs.zip
+	@@rm -f ${OUTPUT}/${BASE_NAME}.docs.zip
 	@@cd tmp/demos && zip -rq ../../${OUTPUT}/${NAME}.docs.zip *
 	@@rm -rf ${OUTPUT}/demos && mv -f tmp/demos ${OUTPUT}
 	# Finish by removing the temporary files
@@ -160,7 +163,7 @@ zip: init css js
 	@@mkdir tmp
 	@@cp -R ${OUTPUT} tmp/${NAME}
 	# ... And remove the Zipped docs so they aren't included twice (for deploy scripts)
-	@@rm -rf tmp/${NAME}/${NAME}.docs.zip
+	@@rm -rf tmp/${NAME}/*.zip
 	@@cd tmp; zip -rq ../${OUTPUT}/${NAME}.zip ${NAME}
 	@@rm -rf tmp
 	# -------------------------------------------------
@@ -194,7 +197,7 @@ deploy_nightlies:
 	# -------------------------------------------------
 
 # Deploy a finished release. This is manually done.
-deploy: init css js docs zip
+deploy: clean init css js docs zip
 	# Deploying all the files to the CDN
 	@@mkdir tmp
 	@@cp -R ${OUTPUT} tmp/${VER_OFFICIAL}
@@ -207,7 +210,7 @@ deploy: init css js docs zip
 	@@find tmp/${VER_OFFICIAL} -type f \
 		\( -name '*.html' -o -name '*.php' \) \
 		-exec perl -pi -e \
-		's|src="(.*)${NAME}.min.js"|src="//code.jquery.com/mobile/${VER_OFFICIAL}/${NAME}.min.js"|g;s|href="(.*)${NAME}.min.css"|href="//code.jquery.com/mobile/${VER_OFFICIAL}/${NAME}.min.css"|g;s|src="(.*)jquery.js"|src="//code.jquery.com/jquery-1.7.1.min.js"|g' {} \;
+		's|src="(.*)${BASE_NAME}.js"|src="//code.jquery.com/mobile/${VER_OFFICIAL}/${NAME}.min.js"|g;s|href="(.*)${BASE_NAME}.css"|href="//code.jquery.com/mobile/${VER_OFFICIAL}/${NAME}.min.css"|g;s|src="(.*)jquery.js"|src="//code.jquery.com/jquery-1.7.1.min.js"|g' {} \;
 	# ... So they can be copied to jquerymobile.com
 	@@scp -qr tmp/* jqadmin@jquerymobile.com:/srv/jquerymobile.com/htdocs/demos/
 	# Do some cleanup to wrap it up

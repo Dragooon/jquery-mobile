@@ -1,114 +1,113 @@
+jQuery Mobile Framework
+=======================
+[Official Site: http://jquerymobile.com](http://jquerymobile.com)
 
-jQuery Mobile Splitview plugin
--------------------------------
-demo at: asyraf9.github.com/jquery-mobile/
+[Demos and Documentation](http://jquerymobile.com/test/)
 
-This is a plugin for jQuery Mobile that detects your device's browser width and renders pages accordingly - e.g. splitview for desktop and tablets, and standard jqm for mobile phones. 
+How to build your own jQuery Mobile CSS and JS files
+====================================================
+Clone this repo and build the js and css files (you'll need Git and Make installed):
 
-Features
--------------------------------
-1. auto-detection of how to render for the browser you are using.
-2. independent panel scrolling (still a lot more to work on here)
-3. orientation and resize aware - renders the side panel in a popover fashion when in portrait mode
-4. context awareness - can be programmed so that opening a page on the side panel also opens a page on the main panel
-5. deep-link (and history) awareness - linking to a specific page in the main panel works, and hitting on the back and forward button on your browser also works (only for the main panel pages)
-6. panel specific links - links on the side panel can affect pages in the main panel, or in the side panel itself.  
+    git clone git://github.com/jquery/jquery-mobile.git
+    cd jquery-mobile
+    make
 
-Anatomy of a Splitview page
--------------------------------
-the anatomy of a splitview page can be seen at the demo page above. Basically, you need to position your pages in the following order:
+A full version and a minified version of the jQuery Mobile JavaScript and CSS files will be created
+in a folder named "compiled". There is also now a Structure only css file so you can add your own theme on top of it.
 
-	<!DOCTYPE html> 
-		<html> 
-			<head> 
-				<title>Page Title</title> 
-				
-				<meta name="viewport" content="width=device-width, initial-scale=1"> 
+How to build a self-contained version of the Docs/Demos
+=======================================================
+Once you have your own cloned repo on your computer:
 
-			    <link rel="stylesheet" href="stylesheets/jquery.mobile-1.0b2.min.css" />
-			    <link rel="stylesheet" href="../../compiled/jquery.mobile-1.0b2pre.css" />
-			    <link rel="stylesheet" href="jquery.mobile.splitview.css" />
-			    <link rel="stylesheet"  href="jquery.mobile.scrollview.css" />
-			    <link rel="stylesheet"  href="jquery.mobile.grids.collapsible.css" />
-			    <script type="text/javascript" src="jquery-1.6.2.js"></script>
-			    <script type="text/javascript" src="jquery.mobile.splitview.js"></script>
-			    <script type="text/javascript" src="../../compiled/jquery.mobile-1.0b2pre.js"></script>
-			    <script type="text/javascript" src="jquery.easing.1.3.js"></script>
-			    <script type="text/javascript" src="jquery.mobile.scrollview.js"></script>
-			</head> 
-			<body> 
-				<div data-role="panel" data-id="menu">
-					<!-- Start of first page -->
-					<div data-role="page" id="foo">
+    make docs
 
-						<div data-role="header">
-							<h1>Foo</h1>
-						</div><!-- /header -->
-
-						<div data-role="content">	
-							<p>I'm first in the source order so I'm shown as the page.</p>		
-							<p>View internal page called <a href="#bar">bar</a></p>	
-						</div><!-- /content -->
-
-						<div data-role="footer">
-							<h4>Page Footer</h4>
-						</div><!-- /footer -->
-					</div><!-- /page -->
-					<!-- other side panel pages here -->
-				</div>
-				<div data-role="panel" data-id="main">
-					<!-- Start of second page -->
-					<div data-role="page" id="bar">
-
-						<div data-role="header">
-							<h1>Bar</h1>
-						</div><!-- /header -->
-
-						<div data-role="content">	
-							<p>I'm first in the source order so I'm shown as the page.</p>		
-							<p><a href="#foo">Back to foo</a></p>	
-						</div><!-- /content -->
-
-						<div data-role="footer">
-							<h4>Page Footer</h4>
-						</div><!-- /footer -->
-					</div><!-- /page -->
-					<!-- other main panel pages here -->
-				</div>
-			</body>
-		</html> 
-
-NOTE: although with this beta2 release I've managed to minimize the amount of changes made in jqm core, there are still about 3 lines of code I needed to add. make sure you use the version provided in this fork of jqm by running 'make' in a terminal, and finding the jquerymobile js and css files in the /compiled folder created by 'make'. (also make sure to run this in the beta2 branch, or you won't get the most up to date files)
-
-pages can also be loaded dynamically provided you specify the panel it needs to load into (as explained below). you need to preload two pages - one for each panel, to avoid an empty page on either of your panels.
-
-Panel settings
--------------------------------
-there are two settings for panel divs:
-
-1. data-hash - takes the following values: true(default), false, and crumbs
-this attribute tells splitview to track history for the panel or not (true and false), or to set a 'crumb' (crumbs) button at the top left portion of the header for each page. 
-
-2. data-context - takes a jQuery selector value, or a hash of the following: url, panel, refresh.
-data-context tells splitview to load another page whose link can be found in the active page by the jQuery selector value, or a page which is pointed to by the hash. example:
-
-	<div data-role="panel" data-id="menu" data-hash="crumbs" data-context="a#default">
-
-OR  
-  
-	<div data-role="panel" data-id="menu" data-hash="crumbs" data-context='{"url":"#bar", "panel":"main", "refresh":false}'>
-
-NOTE: this attribute, if used on a page, overrides panel data-context attributes. example:
-
-	<div data-role="page" data-context="a#default">
-
-Splitview Links
--------------------------------
-splitview links work just like the links in jQuery Mobile. the only difference is, you can define the panel you want the page that link points to load into using the 'data-panel' attribute. for example:
-
-	<a href="some_other_page" data-panel="main">
-
-this method also loads ajax pages. 
+The docs will be built and available in the compiled/demos folder. You can move this folder to your web server or
+other location. It has no dependencies on anything other than a basic HTML web server.
 
 
-that's about it! splitview does everything else for you... enjoy it, and let me know if you have any issues with it! thanks!
+Submitting bugs
+===============
+If you think you've found a bug, please report it by following these instructions:
+
+1. Visit the [Issue tracker: https://github.com/jquery/jquery-mobile/issues](https://github.com/jquery/jquery-mobile/issues)
+2. Create an issue explaining the problem and expected result
+    - Be sure to include any relevant information for reproducing the issue
+    - Include information such as:
+        * Browser/device (with version #)
+        * The version of the jQuery Mobile code you're running
+        * If you are running from a git version, include the date and/or hash number
+    - Make sure that the bug still exists at http://jquerymobile.com/test/ as it may be fixed already
+    - You can use the CDN hosted JS and CSS files to test in your own code by using:
+        * [JS](http://code.jquery.com/mobile/latest/jquery.mobile.min.js)
+        * [CSS](http://code.jquery.com/mobile/latest/jquery.mobile.min.css)
+    - Include a link to some code of the bug in action. You can use either of these services to host your code
+        * [jsbin](http://jsbin.com)
+        * [jsfiddle](http://jsfiddle.net)
+3. Submit the issue.
+
+Recommended: [JS Bin issue template with instructions](http://jsbin.com/omacox/edit)
+
+Issues concerning the jQuery Mobile Theme Roller can be submitted at the [Theme Roller repo: https://github.com/jquery/web-jquery-mobile-theme-roller](https://github.com/jquery/web-jquery-mobile-theme-roller)
+
+Submitting patches
+==================
+To contribute code and bug fixes to jQuery Mobile: fork this project on Github, make changes to the code in your fork,
+and then send a "pull request" to notify the team of updates that are ready to be reviewed for inclusion.
+
+Detailed instructions can be found at [jQuery Mobile Patching](https://gist.github.com/1294035)
+
+Running the jQuery Mobile demos & docs locally
+==============================================
+To preview locally, you'll need to clone a local copy of this repository and point your Apache & PHP webserver at its
+root directory (a webserver is required, as PHP and .htaccess are used for combining development files).
+
+If you don't currently have a webserver running locally, there are a few options.
+
+If you're on a Mac, you can try dropping jQuery Mobile into your sites folder and turning on Web Sharing via System
+Prefs. From there, you'll find a URL where you can browse folders in your sites directory from a browser.
+
+Another quick way to get up and running is to download and install MAMP for Mac OSX. Once installed, just open MAMP,
+click preferences, go to the Apache tab, and select your local jQuery Mobile folder as the root. Then you can open a
+browser to http://localhost:8888 to preview the code.
+
+Another alternative is XAMPP (Mac, Windows). You need to actually modify Apache's httpd.conf to point to your checkout:
+[Instructions](http://www.apachefriends.org/en/xampp.html)
+
+You need the following Apache modules loaded:
+
+* Rewrite (mod\_rewrite.so)
+* Expire (mod\_expires.so)
+* Header (mod\_headers.so)
+
+Alternatively, with the addition of async loading, you can use the python simple http server from the project root:
+
+    $ python -m SimpleHTTPServer 8000
+
+And in your browser visit [localhost:8000](http://localhost:8000/tests/unit/core/). NOTE: The docs will not load as they are dependent on the "/js/" includes which require php. For other development work such as unit tests and custom test pages using
+
+    <script data-main="js/jquery.mobile.docs" src="external/requirejs/require.js"></script>
+
+will allow you to load modules asynchronously without php. Please note that the example above assumes it's inclusion in a page at the root of the directory in which the simple http server was run.
+
+AMD Support in Development
+==========================
+
+Please bear in mind that async loading is not supported for production and is primarily used for the project's build process. As a result developers should expect an initial flash of unstyled content, which will not occur when the library is compiled.
+
+If you find dependency bugs when using the async loading support for development please log them in the github issue tracker.
+
+Building With A Custom Theme
+============================
+To use a custom theme in your own build, you'll need Make installed. You can find the themes in the CSS/Themes folder.
+To create a new theme:
+
+1. Copy the `Default` folder from CSS/Themes to a new folder in the same location. The name of the folder will be the
+theme's name. For testing locally, make sure the index.php file is copied as well.
+2. Edit the `jquery.mobile.theme.css` file so it contains your custom fonts and colors.
+3. Once you are done editing your files and saving them, open a terminal.
+4. Navigate to the jQuery-Mobile folder's root.
+5. Run the following command to build jQuery-Mobile (THEME is the name of the folder for your theme from step 1.):
+
+    make THEME=YourThemeName
+
+6. The compiled files will be located in the "compiled" folder in the root of jQuery-Mobile.

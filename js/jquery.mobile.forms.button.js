@@ -1,7 +1,7 @@
 //>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
-//>>description: Form Buttons
-//>>label: links that proxy to native input/buttons
-//>>group: forms
+//>>description: Custom-styled native input/buttons
+//>>label: Buttons: Input or button-based 
+//>>group: Forms
 //>>css: ../css/themes/default/jquery.mobile.theme.css,../css/structure/jquery.mobile.button.css
 
 define( [ "jquery", "./jquery.mobile.widget", "./jquery.mobile.buttonMarkup"  ], function( $ ) {
@@ -13,7 +13,7 @@ $.widget( "mobile.button", $.mobile.widget, {
 		theme: null,
 		icon: null,
 		iconpos: null,
-		inline: null,
+		inline: false,
 		corners: true,
 		shadow: true,
 		iconshadow: true,
@@ -55,7 +55,7 @@ $.widget( "mobile.button", $.mobile.widget, {
 
 		// Add ARIA role
 		this.button = $( "<div></div>" )
-			.text( $el.text() || $el.val() )
+			[ $el.html() ? "html" : "text" ]( $el.html() || $el.val() )
 			.insertBefore( $el )
 			.buttonMarkup({
 				theme: o.theme,
@@ -131,8 +131,8 @@ $.widget( "mobile.button", $.mobile.widget, {
 			this.enable();
 		}
 
-                // Grab the button's text element from its implementation-independent data item
-		$(this.button.data( 'buttonElements' ).text).text( $el.text() || $el.val() );
+		// Grab the button's text element from its implementation-independent data item
+		$( this.button.data( 'buttonElements' ).text )[ $el.html() ? "html" : "text" ]( $el.html() || $el.val() );
 	}
 });
 

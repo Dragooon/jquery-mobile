@@ -1,6 +1,7 @@
 //>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
 //>>description: Behavior for "fixed" headers and footers
-//>>label: Fixedtoolbar
+//>>label: Toolbars: Fixed
+//>>group: Widgets
 //>>css: ../css/themes/default/jquery.mobile.theme.css,../css/structure/jquery.mobile.fixedToolbar.css
 
 define( [ "jquery", "./jquery.mobile.widget", "./jquery.mobile.core", "./jquery.mobile.navigation", "./jquery.mobile.page", "./jquery.mobile.page.sections", "./jquery.mobile.zoom" ], function( $ ) {
@@ -35,11 +36,9 @@ define( [ "jquery", "./jquery.mobile.widget", "./jquery.mobile.core", "./jquery.
 					wkversion = !!wkmatch && wkmatch[ 1 ],
 					ffmatch = ua.match( /Fennec\/([0-9]+)/ ),
 					ffversion = !!ffmatch && ffmatch[ 1 ],
-					operammobilematch = ua.match( /Opera Mobile\/([0-9]+)/ ),
-					bbmatch = w.blackberry && w.navigator.appVersion.match( /Version\/([0-9]+)/ ),
-					bbversion = !!bbmatch && parseInt( bbmatch[ 1 ], 10 ),
+					operammobilematch = ua.match( /Opera Mobi\/([0-9]+)/ ),
 					omversion = !!operammobilematch && operammobilematch[ 1 ];
-					
+
 				if(
 					// iOS 4.3 and older : Platform is iPhone/Pad/Touch and Webkit version is less than 534 (ios5)
 					( ( platform.indexOf( "iPhone" ) > -1 || platform.indexOf( "iPad" ) > -1  || platform.indexOf( "iPod" ) > -1 ) && wkversion && wkversion < 534 )
@@ -47,7 +46,7 @@ define( [ "jquery", "./jquery.mobile.widget", "./jquery.mobile.core", "./jquery.
 					// Opera Mini
 					( w.operamini && ({}).toString.call( w.operamini ) === "[object OperaMini]" )
 					||
-					( operammobilematch && omverson < 7458 )
+					( operammobilematch && omversion < 7458 )
 					||
 					//Android lte 2.1: Platform is Android and Webkit version is less than 533 (Android 2.2)
 					( ua.indexOf( "Android" ) > -1 && wkversion && wkversion < 533 )
@@ -57,9 +56,6 @@ define( [ "jquery", "./jquery.mobile.widget", "./jquery.mobile.core", "./jquery.
 					||
 					// WebOS less than 3
 					( "palmGetResource" in window && wkversion && wkversion < 534 )
-					||
-					// BlackBerry six and below.
-					( w.blackberry && bbversion < 7 )
 					||
 					// MeeGo
 					( ua.indexOf( "MeeGo" ) > -1 && ua.indexOf( "NokiaBrowser/8.5.0" ) > -1 )
@@ -77,7 +73,7 @@ define( [ "jquery", "./jquery.mobile.widget", "./jquery.mobile.core", "./jquery.
 			var self = this,
 				o = self.options,
 				$el = self.element,
-				tbtype = $el.is( ".ui-header" ) ? "header" : "footer",
+				tbtype = $el.is( ":jqmData(role='header')" ) ? "header" : "footer",
 				$page = $el.closest(".ui-page");
 
 			// Feature detecting support for
@@ -89,7 +85,7 @@ define( [ "jquery", "./jquery.mobile.widget", "./jquery.mobile.core", "./jquery.
 			$el.addClass( "ui-"+ tbtype +"-fixed" );
 
 			// "fullscreen" overlay positioning
-			if( $el.jqmData( "fullscreen" ) ){
+			if( o.fullscreen ){
 				$el.addClass( "ui-"+ tbtype +"-fullscreen" );
 				$page.addClass( "ui-page-" + tbtype + "-fullscreen" );
 			}
@@ -129,8 +125,8 @@ define( [ "jquery", "./jquery.mobile.widget", "./jquery.mobile.core", "./jquery.
 					if( o.disablePageZoom ){
 						$.mobile.zoom.disable( true );
 					}
-					if( o.visibleOnPageShow ){
-						self.show( true );
+					if( !o.visibleOnPageShow ){
+						self.hide( true );
 					}
 				} )
 				.bind( "webkitAnimationStart animationstart updatelayout", function(){
@@ -174,7 +170,7 @@ define( [ "jquery", "./jquery.mobile.widget", "./jquery.mobile.core", "./jquery.
 				});
 		},
 
-		_visible: false,
+		_visible: true,
 
 		// This will set the content element's top or bottom padding equal to the toolbar's height
 		updatePagePadding: function() {
@@ -186,22 +182,30 @@ define( [ "jquery", "./jquery.mobile.widget", "./jquery.mobile.core", "./jquery.
 
 			$el.closest( ".ui-page" ).css( "padding-" + ( header ? "top" : "bottom" ), $el.outerHeight() );
 		},
-
-		show: function( notransition ){
-			var hideClass = "ui-fixed-hidden",
+		
+		_useTransition: function( notransition ){
+			var $win = $( window ),
 				$el = this.element,
-				$win = $( window ),
 				scroll = $win.scrollTop(),
 				elHeight = $el.height(),
 				pHeight = $el.closest( ".ui-page" ).height(),
-				viewportHeight = Math.min( screen.height, $win.height() ),
-				tbtype = $el.is( ".ui-header" ) ? "header" : "footer";
-
-				if( !notransition && ( this.options.transition && this.options.transition !== "none" &&
-					(
+				viewportHeight = $.mobile.getScreenHeight(),
+				tbtype = $el.is( ":jqmData(role='header')" ) ? "header" : "footer";
+				
+			return !notransition &&
+				( this.options.transition && this.options.transition !== "none" &&
+				(
 					( tbtype === "header" && !this.options.fullscreen && scroll > elHeight ) ||
 					( tbtype === "footer" && !this.options.fullscreen && scroll + viewportHeight < pHeight - elHeight )
-					) || this.options.fullscreen ) ){
+				) || this.options.fullscreen
+				);
+		},
+
+		show: function( notransition ){
+			var hideClass = "ui-fixed-hidden",
+				$el = this.element;
+
+				if( this._useTransition( notransition ) ){
 				$el
 					.removeClass( "out " + hideClass )
 					.addClass( "in" );
@@ -215,20 +219,10 @@ define( [ "jquery", "./jquery.mobile.widget", "./jquery.mobile.core", "./jquery.
 		hide: function( notransition ){
 			var hideClass = "ui-fixed-hidden",
 				$el = this.element,
-				$win = $( window ),
-				scroll = $win.scrollTop(),
-				elHeight = $el.height(),
-				pHeight = $el.closest( ".ui-page" ).height(),
-				viewportHeight = Math.min( screen.height, $win.height() ),
-				tbtype = $el.is( ".ui-header" ) ? "header" : "footer",
 				// if it's a slide transition, our new transitions need the reverse class as well to slide outward
 				outclass = "out" + ( this.options.transition === "slide" ? " reverse" : "" );
 
-			if( !notransition && ( this.options.transition && this.options.transition !== "none" &&
-					(
-					( tbtype === "header" && !this.options.fullscreen && scroll > elHeight ) ||
-					( tbtype === "footer" && !this.options.fullscreen && scroll + viewportHeight < pHeight - elHeight )
-					) || this.options.fullscreen ) ){
+			if( this._useTransition( notransition ) ){
 				$el
 					.addClass( outclass )
 					.removeClass( "in" )
@@ -273,9 +267,17 @@ define( [ "jquery", "./jquery.mobile.widget", "./jquery.mobile.core", "./jquery.
 	});
 
 	//auto self-init widgets
-	$( document ).bind( "pagecreate create", function( e ){
-		$.mobile.fixedtoolbar.prototype.enhanceWithin( e.target );
-	});
+	$( document )
+		.bind( "pagecreate create", function( e ){
+			
+			// DEPRECATED in 1.1: support for data-fullscreen=true|false on the page element.
+			// This line ensures it still works, but we recommend moving the attribute to the toolbars themselves.
+			if( $( e.target ).jqmData( "fullscreen" ) ){
+				$( $.mobile.fixedtoolbar.prototype.options.initSelector, e.target ).not( ":jqmData(fullscreen)" ).jqmData( "fullscreen", true );
+			}
+			
+			$.mobile.fixedtoolbar.prototype.enhanceWithin( e.target );
+		});
 
 })( jQuery );
 //>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);

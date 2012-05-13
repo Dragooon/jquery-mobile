@@ -1,8 +1,9 @@
 //>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
-//>>description: The base file for jQM
+//>>description: Base file for jQuery Mobile
 //>>label: Core
-//>>group: core
+//>>group: Core
 //>>required: true
+//>>css: ../css/structure/jquery.mobile.core.css
 
 define( [ "jquery", "../external/requirejs/text!../version.txt", "./jquery.mobile.widget" ], function( $, __version__ ) {
 //>>excludeEnd("jqmBuildExclude");
@@ -49,7 +50,7 @@ define( [ "jquery", "../external/requirejs/text!../version.txt", "./jquery.mobil
 		maxTransitionWidth: false,
 
 		// Minimum scroll distance that will be remembered when returning to a page
-		minScrollBack: 10,
+		minScrollBack: 250,
 
 		// DEPRECATED: the following property is no longer in use, but defined until 2.0 to prevent conflicts
 		touchOverflowEnabled: false,
@@ -57,18 +58,8 @@ define( [ "jquery", "../external/requirejs/text!../version.txt", "./jquery.mobil
 		// Set default dialog transition - 'none' for no transitions
 		defaultDialogTransition: "pop",
 
-		// Show loading message during Ajax requests
-		// if false, message will not appear, but loading classes will still be toggled on html el
-		loadingMessage: "loading",
-
 		// Error response message - appears when an Ajax page request fails
 		pageLoadErrorMessage: "Error Loading Page",
-
-		// Should the text be visble in the loading message?
-		loadingMessageTextVisible: false,
-
-		// When the text is visible, what theme does the loading box use?
-		loadingMessageTheme: "a",
 
 		// For error messages, which theme does the box uses?
 		pageLoadErrorMessageTheme: "e",
@@ -84,6 +75,10 @@ define( [ "jquery", "../external/requirejs/text!../version.txt", "./jquery.mobil
 
 		// turn of binding to the native orientationchange due to android orientation behavior
 		orientationChangeEnabled: true,
+
+		buttonMarkup: {
+			hoverDelay: 200
+		},
 
 		// TODO might be useful upstream in jquery itself ?
 		keyCode: {

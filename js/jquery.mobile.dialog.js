@@ -1,6 +1,7 @@
 //>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
-//>>description: Degrades inputs to another type after custom enhancements are made.
-//>>label: Dialog-style Pages
+//>>description: Displays a page as a modal dialog with inset appearance and overlay background
+//>>label: Dialogs
+//>>group: Widgets
 //>>css: ../css/themes/default/jquery.mobile.theme.css,../css/structure/jquery.mobile.dialog.css
 
 define( [ "jquery", "./jquery.mobile.widget" ], function( $ ) {
@@ -66,6 +67,7 @@ $.widget( "mobile.dialog", $.mobile.widget, {
 			}
 		})
 		.bind( "pagehide", function( e, ui ) {
+			self._isClosed = false;
 			$( this ).find( "." + $.mobile.activeBtnClass ).removeClass( $.mobile.activeBtnClass );
 		})
 		// Override the theme set by the page plugin on pageshow
@@ -80,7 +82,10 @@ $.widget( "mobile.dialog", $.mobile.widget, {
 
 	// Close method goes back in history
 	close: function() {
-		window.history.back();
+		if ( !this._isClosed ) {
+			this._isClosed = true;
+			window.history.back();
+		}
 	}
 });
 

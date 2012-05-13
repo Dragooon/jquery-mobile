@@ -1,8 +1,9 @@
 //>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
 //>>description: history.pushState support, layered on top of hashchange.
 //>>label: Pushstate Support
+//>>group: Navigation
 
-define( [ "jquery", "./jquery.mobile.navigation", "../external/requirejs/depend!./jquery.mobile.hashchange[jquery]" ], function( $ ) {
+define( [ "jquery", "./jquery.mobile.navigation", "../external/requirejs/depend!./jquery.hashchange[jquery]" ], function( $ ) {
 //>>excludeEnd("jqmBuildExclude");
 ( function( $, window ) {
 	// For now, let's Monkeypatch this onto the end of $.mobile._registerInternalEvents
@@ -18,6 +19,10 @@ define( [ "jquery", "./jquery.mobile.navigation", "../external/requirejs/depend!
 		initialFilePath: (function() {
 			return url.pathname + url.search;
 		})(),
+
+		hashChangeTimeout: 200,
+
+		hashChangeEnableTimer: undefined,
 
 		initialHref: url.hrefNoHash,
 
@@ -43,11 +48,6 @@ define( [ "jquery", "./jquery.mobile.navigation", "../external/requirejs/depend!
 			}
 
 			return url;
-		},
-
-		hashValueAfterReset: function( url ) {
-			var resetUrl = self.resetUIKeys( url );
-			return $.mobile.path.parseUrl( resetUrl ).hash;
 		},
 
 		// TODO sort out a single barrier to hashchange functionality
@@ -100,41 +100,28 @@ define( [ "jquery", "./jquery.mobile.navigation", "../external/requirejs/depend!
 		// cleaned up by the additional hash handling
 		onPopState: function( e ) {
 			var poppedState = e.originalEvent.state,
-				timeout, fromHash, toHash, hashChanged;
+				fromHash, toHash, hashChanged;
 
 			// if there's no state its not a popstate we care about, eg chrome's initial popstate
 			if( poppedState ) {
-				// the active url in the history stack will still be from the previous state
-				// so we can use it to verify if a hashchange will be fired from the popstate
-				fromHash = self.hashValueAfterReset( $.mobile.urlHistory.getActive().url );
+				// if we get two pop states in under this.hashChangeTimeout
+				// make sure to clear any timer set for the previous change
+				clearTimeout( self.hashChangeEnableTimer );
 
-				// the hash stored in the state popped off the stack will be our currenturl or
-				// the url to which we wish to navigate
-				toHash = self.hashValueAfterReset( poppedState.hash.replace("#", "") );
-
-				// if the hashes of the urls are different we must assume that the browser
-				// will fire a hashchange
-				hashChanged = fromHash !== toHash;
-
-				// unlock hash handling once the hashchange caused be the popstate has fired
-				if( hashChanged ) {
-					$win.one( "hashchange.pushstate", function() {
-						self.nextHashChangePrevented( false );
-					});
-				}
-
-				// enable hash handling for the the _handleHashChange call
+				// make sure to enable hash handling for the the _handleHashChange call
 				self.nextHashChangePrevented( false );
 
-				// change the page based on the hash
+				// change the page based on the hash in the popped state
 				$.mobile._handleHashChange( poppedState.hash );
 
-				// only prevent another hash change handling if a hash change will be fired
-				// by the browser
-				if( hashChanged ) {
-					// disable hash handling until one of the above timers fires
-					self.nextHashChangePrevented( true );
-				}
+				// prevent any hashchange in the next self.hashChangeTimeout
+				self.nextHashChangePrevented( true );
+
+				// re-enable hash change handling after swallowing a possible hash
+				// change event that comes on all popstates courtesy of browsers like Android
+				self.hashChangeEnableTimer = setTimeout( function() {
+					self.nextHashChangePrevented( false );
+				}, self.hashChangeTimeout);
 			}
 		},
 

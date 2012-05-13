@@ -8,7 +8,7 @@
 	<link rel="stylesheet" href="../_assets/css/jqm-docs.css"/>
 	<script src="../../js/jquery.js"></script>
 	
-	<script src="../_assets/js/jqm-docs.js"></script>
+	<script src="../../docs/_assets/js/jqm-docs.js"></script>
 	<script src="../../js/"></script>
 </head> 
 <body> 
@@ -71,7 +71,7 @@
 </div><!-- /content -->
 
 <div data-role="footer" class="footer-docs" data-theme="c">
-		<p>&copy; 2011-12 The jQuery Project</p>
+		<p>&copy; 2011-12 The jQuery Foundation</p>
 </div>
 	
 </div><!-- /page -->

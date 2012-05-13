@@ -1,6 +1,7 @@
 //>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
-//>>description: For making button-like links.
-//>>label: Buttons
+//>>description: Applies button styling to links
+//>>label: Buttons: Link-based
+//>>group: Forms
 //>>css: ../css/themes/default/jquery.mobile.theme.css, ../css/structure/jquery.mobile.button.css
 
 define( [ "jquery", "./jquery.mobile.core", "./jquery.mobile.vmouse" ], function( $ ) {
@@ -78,6 +79,12 @@ $.fn.buttonMarkup = function( options ) {
 			buttonClass += o.mini ? " ui-mini" : " ui-fullsize";
 		}
 		
+		if ( o.inline !== undefined ) {			
+			// Used to control styling in headers/footers, where buttons default to `mini` style.
+			buttonClass += o.inline === false ? " ui-btn-block" : " ui-btn-inline";
+		}
+		
+		
 		if ( o.icon ) {
 			o.icon = "ui-icon-" + o.icon;
 			o.iconpos = o.iconpos || "left";
@@ -117,6 +124,7 @@ $.fn.buttonMarkup = function( options ) {
 		if ( buttonIcon ) {
 			buttonIcon.className = iconClass;
 			if ( !(buttonElements && buttonElements.icon) ) {
+				buttonIcon.appendChild( document.createTextNode("\u00a0") );
 				buttonInner.appendChild( buttonIcon );
 			}
 		}
@@ -154,7 +162,6 @@ $.fn.buttonMarkup.defaults = {
 	corners: true,
 	shadow: true,
 	iconshadow: true,
-	inline: false,
 	wrapperEls: "span"
 };
 
@@ -178,8 +185,8 @@ function closestEnabledButton( element ) {
 }
 
 var attachEvents = function() {
-	var hoverDelay = 200,
-		hov, foc;
+	var hoverDelay = $.mobile.buttonMarkup.hoverDelay, hov, foc;
+
 	$( document ).bind( {
 		"vmousedown vmousecancel vmouseup vmouseover vmouseout focus blur scrollstart": function( event ) {
 			var theme,

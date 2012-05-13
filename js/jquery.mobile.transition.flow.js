@@ -3,9 +3,10 @@
 */
 
 //>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
-//>>description: Fallback transition for flow in non-3D supporting browsers
-//>>label: Flow fallback transition
-//>>css: ../css/themes/default/jquery.mobile.transition.flow.css
+//>>description: Animation styles and fallback transition definition for non-3D supporting browsers
+//>>label: Flow Transition
+//>>group: Transitions
+//>>css: ../css/structure/jquery.mobile.transition.flow.css
 
 define( [ "jquery", "./jquery.mobile.transition" ], function( $ ) {
 //>>excludeEnd("jqmBuildExclude");

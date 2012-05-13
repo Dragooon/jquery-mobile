@@ -1,6 +1,7 @@
 //>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
-//>>description: Creates collapsible content areas.
-//>>label: Collapsibles
+//>>description: Creates collapsible content blocks.
+//>>label: Collapsible
+//>>group: Widgets
 //>>css: ../css/themes/default/jquery.mobile.theme.css,../css/structure/jquery.mobile.collapsible.css
 
 define( [ "jquery", "./jquery.mobile.widget", "./jquery.mobile.buttonMarkup" ], function( $ ) {
@@ -15,7 +16,6 @@ $.widget( "mobile.collapsible", $.mobile.widget, {
 		heading: "h1,h2,h3,h4,h5,h6,legend",
 		theme: null,
 		contentTheme: null,
-		iconTheme: "d",
 		mini: false,
 		initSelector: ":jqmData(role='collapsible')"
 	},
@@ -25,6 +25,8 @@ $.widget( "mobile.collapsible", $.mobile.widget, {
 			o = this.options,
 			collapsible = $el.addClass( "ui-collapsible" ),
 			collapsibleHeading = $el.children( o.heading ).first(),
+			collapsedIcon = $el.jqmData("collapsed-icon") || o.collapsedIcon,
+			expandedIcon = $el.jqmData("expanded-icon") || o.expandedIcon,
 			collapsibleContent = collapsible.wrapInner( "<div class='ui-collapsible-content'></div>" ).find( ".ui-collapsible-content" ),
 			collapsibleSet = $el.closest( ":jqmData(role='collapsible-set')" ).addClass( "ui-collapsible-set" );
 
@@ -45,6 +47,14 @@ $.widget( "mobile.collapsible", $.mobile.widget, {
 				o.contentTheme = collapsibleSet.jqmData( "content-theme" );
 			}
 
+			// Get the preference for collapsed icon in the set
+			if ( !o.collapsedIcon ) {
+				o.collapsedIcon = collapsibleSet.jqmData( "collapsed-icon" );
+			}
+			// Get the preference for expanded icon in the set
+			if ( !o.expandedIcon ) {
+				o.expandedIcon = collapsibleSet.jqmData( "expanded-icon" );
+			}
 			// Gets the preference icon position in the set
 			if ( !o.iconPos ) {
 				o.iconPos = collapsibleSet.jqmData( "iconpos" );
@@ -55,6 +65,9 @@ $.widget( "mobile.collapsible", $.mobile.widget, {
 			}
 		}
 		collapsibleContent.addClass( ( o.contentTheme ) ? ( "ui-body-" + o.contentTheme ) : "");
+
+		collapsedIcon = $el.jqmData( "collapsed-icon" ) || o.collapsedIcon || "plus";
+		expandedIcon = $el.jqmData( "expanded-icon" ) || o.expandedIcon || "minus";
 
 		collapsibleHeading
 			//drop heading in before content
@@ -69,7 +82,7 @@ $.widget( "mobile.collapsible", $.mobile.widget, {
 					shadow: false,
 					corners: false,
 					iconpos: $el.jqmData( "iconpos" ) || o.iconPos || "left",
-					icon: "plus",
+					icon: collapsedIcon,
 					mini: o.mini,
 					theme: o.theme
 				})
@@ -93,8 +106,10 @@ $.widget( "mobile.collapsible", $.mobile.widget, {
 							.text( isCollapse ? o.expandCueText : o.collapseCueText )
 						.end()
 						.find( ".ui-icon" )
-							.toggleClass( "ui-icon-minus", !isCollapse )
-							.toggleClass( "ui-icon-plus", isCollapse );
+							.toggleClass( "ui-icon-" + expandedIcon, !isCollapse )
+							.toggleClass( "ui-icon-" + collapsedIcon, isCollapse )
+						.end()
+						.find( "a" ).first().removeClass( $.mobile.activeBtnClass );
 
 					$this.toggleClass( "ui-collapsible-collapsed", isCollapse );
 					collapsibleContent.toggleClass( "ui-collapsible-content-collapsed", isCollapse ).attr( "aria-hidden", isCollapse );
@@ -111,6 +126,9 @@ $.widget( "mobile.collapsible", $.mobile.widget, {
 			.trigger( o.collapsed ? "collapse" : "expand" );
 
 		collapsibleHeading
+			.bind( "tap", function( event ) {
+				collapsibleHeading.find( "a" ).first().addClass( $.mobile.activeBtnClass );
+			})
 			.bind( "click", function( event ) {
 
 				var type = collapsibleHeading.is( ".ui-collapsible-heading-collapsed" ) ?
@@ -119,6 +137,7 @@ $.widget( "mobile.collapsible", $.mobile.widget, {
 				collapsible.trigger( type );
 
 				event.preventDefault();
+				event.stopPropagation();
 			});
 	}
 });

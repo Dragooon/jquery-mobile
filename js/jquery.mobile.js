@@ -1,6 +1,9 @@
 //>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
+//>>group: exclude
+
 define([
 	'require',
+	'./jquery.mobile.loader',
 	'./jquery.mobile.navigation',
 	'./jquery.mobile.navigation.pushstate',
 	'./jquery.mobile.transition.pop',
@@ -20,6 +23,7 @@ define([
 	'./jquery.mobile.navbar',
 	'./jquery.mobile.listview',
 	'./jquery.mobile.listview.filter',
+	'./jquery.mobile.listview.autodividers',
 	'./jquery.mobile.nojs',
 	'./jquery.mobile.forms.checkboxradio',
 	'./jquery.mobile.forms.button',

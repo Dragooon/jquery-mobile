@@ -1,7 +1,7 @@
 //>>excludeStart("jqmBuildExclude", pragmas.jqmBuildExclude);
-//>>description: Consistent styling for native select menus.
-//>>label: Enhanced Native Selects
-//>>group: forms
+//>>description: Consistent styling for native select menus. Tapping opens a native select menu.
+//>>label: Selects
+//>>group: Forms
 //>>css: ../css/themes/default/jquery.mobile.theme.css, ../css/structure/jquery.mobile.forms.select.css
 
 define( [ "jquery", "./jquery.mobile.core", "./jquery.mobile.widget", "./jquery.mobile.buttonMarkup", "./jquery.mobile.zoom" ], function( $ ) {
@@ -14,11 +14,10 @@ $.widget( "mobile.selectmenu", $.mobile.widget, {
 		disabled: false,
 		icon: "arrow-d",
 		iconpos: "right",
-		inline: null,
+		inline: false,
 		corners: true,
 		shadow: true,
 		iconshadow: true,
-		menuPageTheme: "b",
 		overlayTheme: "a",
 		hidePlaceholderMenuItems: true,
 		closeText: "Close",
@@ -61,11 +60,11 @@ $.widget( "mobile.selectmenu", $.mobile.widget, {
 		if( !!~this.element[0].className.indexOf( "ui-btn-left" ) ) {
 			classes =  " ui-btn-left";
 		}
-		
+
 		if(  !!~this.element[0].className.indexOf( "ui-btn-right" ) ) {
 			classes = " ui-btn-right";
 		}
-		
+
 		this.select = this.element.wrap( "<div class='ui-select" + classes + "'>" );
 		this.selectID  = this.select.attr( "id" );
 		this.label = $( "label[for='"+ this.selectID +"']" ).addClass( "ui-select" );
@@ -96,7 +95,6 @@ $.widget( "mobile.selectmenu", $.mobile.widget, {
 
 			// TODO values buttonId and menuId are undefined here
 			button = this.button
-				.text( $( this.select[ 0 ].options.item( selectedIndex ) ).text() )
 				.insertBefore( this.select )
 				.buttonMarkup( {
 					theme: options.theme,
@@ -108,6 +106,8 @@ $.widget( "mobile.selectmenu", $.mobile.widget, {
 					iconshadow: options.iconshadow,
 					mini: options.mini
 				});
+
+		this.setButtonText();
 
 		// Opera does not properly support opacity on select elements
 		// In Mini, it hides the element, but not its text
@@ -194,16 +194,24 @@ $.widget( "mobile.selectmenu", $.mobile.widget, {
 	},
 
 	setButtonText: function() {
-		var self = this, selected = this.selected();
+		var self = this,
+			selected = this.selected(),
+			text = this.placeholder,
+			span = $( document.createElement("span") );
 
-		this.button.find( ".ui-btn-text" ).text( function() {
-			if ( !self.isMultiple ) {
-				return selected.text();
+		this.button.find( ".ui-btn-text" ).html(function() {
+			if ( selected.length ) {
+				text = selected.map(function() {
+					return $( this ).text();
+				}).get().join( ", " );
+			} else {
+				text = self.placeholder;
 			}
 
-			return selected.length ? selected.map( function() {
-				return $( this ).text();
-			}).get().join( ", " ) : self.placeholder;
+			// TODO possibly aggregate multiple select option classes
+			return span.text( text )
+				.addClass( self.select.attr("class") )
+				.addClass( selected.attr("class") );
 		});
 	},
 

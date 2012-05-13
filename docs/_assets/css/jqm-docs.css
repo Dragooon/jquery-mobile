@@ -12,6 +12,35 @@ body { background: #dddddd; }
 .ui-mobile #jqm-version { text-indent: -99999px; background: url(../images/version.png) top right no-repeat; width: 119px; height: 122px; overflow: hidden; position: absolute; z-index: 50; top: -11px; right: 0; }
 .ui-mobile .jqm-themeswitcher { margin: 10px 25px 10px 10px;  }
 
+.jqm-version {
+	background: #f7cf57;
+	border: solid #fff;
+	border-width: 2px 0;
+	color: #000;
+	display: block;
+	font-weight: bold;
+	position: absolute;
+	padding: .25em 3em;
+	right: -2.5em;
+	text-align: center;
+	text-shadow: 0 1px 1px #fff;
+	top: .75em;
+	width: 78px;
+	z-index: 9;
+	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	-o-transform: rotate(45deg);
+	transform: rotate(45deg);
+
+	-webkit-box-shadow: 0 0 6px rgba(0,0,0,.40);
+	-moz-box-shadow: 0 0 6px rgba(0,0,0,.40);
+	-o-box-shadow: 0 0 6px rgba(0,0,0,.40);
+	box-shadow: 0 0 6px rgba(0,0,0,.40);
+}
+.jqm-version b {
+	color: #a21412;
+}
+
 h2 { margin:1.2em 0 .4em 0; }
 p code { font-size:1.2em; font-weight:bold; } 
 h4 code {font-size:1.2em; font-weight:bold; }
@@ -41,7 +70,6 @@ p.intro {
 		background: none;
 		margin: 1.5em 0;
 		padding: 1.5em 15px 0;
-
 }
 p.intro strong {
 	color:  #558e08;
@@ -50,7 +78,6 @@ p.intro strong {
 	padding: 5px 0;
 }
 .footer-docs p {
-	float: left;
 	margin-left:15px;
 	font-weight: normal;
 	font-size: .9em;
@@ -65,6 +92,8 @@ p.intro strong {
 }
 .type-home .ui-content {
 	margin-top: 5px;
+	overflow: hidden;
+	position: relative;
 }
 .type-interior .ui-content {
 	padding-bottom: 0;
@@ -134,8 +163,7 @@ dd h4 { margin:15px 0 0 0; }
 
 /* F bar theme - just for the docs overview headers */
 .ui-bar-f {
-	border-top: 1px solid 	#56A00E;
-	border-bottom: 1px solid #56A00E;
+	border: 1px solid #56A00E;
 	background: 			#74b042;
 	color: 					#fff;
 	font-weight: bold;

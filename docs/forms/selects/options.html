@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="ui-mobile-rendering">
+<html>
 	<head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -50,14 +50,17 @@
 			<dt><code>icon</code> <em>string</em></dt>
 			<dd>
 				<p class="default">default: "arrow-down"</p>
-				<p>Applies an icon from the <a href="../../buttons/buttons-icons.html">icon set</a> to the custom button. This option is also exposed as a data attribute: <code>data-icon=&quot;star&quot;</code></p>
+				<p>Replaces the default icon "arrow-down" with an icon from the <a href="../../buttons/buttons-icons.html">icon set</a>. This option is also exposed as a data attribute: <code>data-icon=&quot;star&quot;</code>. Setting this attribute to "false" suppresses the icon.</p>
 				<pre><code>$('select').selectmenu(<strong>{ icon: "star" }</strong>);</code></pre>
+				
+				<p>To suppress the icon, a boolean expression must be used:</p>
+				<pre><code>$('select').selectmenu(<strong>{ icon: false }</strong>);</code></pre>
 			</dd>
 			
 			<dt><code>iconpos</code> <em>string</em></dt>
 			<dd>
 				<p class="default">default: "right"</p>
-				<p>Position of the icon in the select button. Possible values: left, right, none, notext. The notext value will display the select as an icon-only button with no text feedback. This option is also exposed as a data attribute: <code>data-iconpos=&quot;left&quot;</code></p>
+				<p>Position of the icon in the select button. Possible values: left, right, top, bottom, notext. The notext value will display the select as an icon-only button with no text feedback. This option is also exposed as a data attribute: <code>data-iconpos=&quot;left&quot;</code></p>
 				<pre><code>$('select').selectmenu(<strong>{ iconpos: "left" }</strong>);</code></pre>
 			</dd>
 			
@@ -163,7 +166,7 @@
 </div><!-- /content -->
 
 <div data-role="footer" class="footer-docs" data-theme="c">
-		<p>&copy; 2011-12 The jQuery Project</p>
+		<p>&copy; 2011-12 The jQuery Foundation</p>
 </div>
 	
 </div><!-- /page -->
