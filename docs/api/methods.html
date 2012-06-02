@@ -85,7 +85,7 @@
 <strong>//transition to the "about us" page with a slideup transition</strong>
 $.mobile.changePage( "about/us.html", { transition: "slideup"} );
 
-<strong>//transition to the "search results" page, using data from a form with an ID of "search"</strong>
+<strong>//transition to the "search results" page, using data from a form with an id of "search"</strong>
 $.mobile.changePage( "searchresults.php", {
 	type: "post",
 	data: $("form#search").serialize()
@@ -122,6 +122,7 @@ $.mobile.changePage( "../alerts/confirm.html", {
 									<li><code>pageContainer</code> (jQuery collection,	default:	$.mobile.pageContainer) Specifies the element that should contain the page after it is loaded. </li>
 									<li><code>reloadPage</code> (<em>boolean</em>, default: false) Forces a reload of a page, even if it is already in the DOM of the page container. </li>
 									<li><code>role</code> (<em>string</em>,	default:	undefined) The data-role value to be used when displaying the page. By default this is undefined which means rely on the value of the @data-role attribute defined on the element.</li>
+									<li><code>showLoadMsg</code> (<em>boolean</em>,	default: false) Decides whether or not to show the loading message when loading external pages.</li>
 									<li><code>type</code> (<em>string</em>, default: &quot;get&quot;) Specifies the method ("get" or "post") to use when making a page request.
 									</li>
 								</ul>
@@ -138,7 +139,7 @@ $.mobile.changePage( "../alerts/confirm.html", {
 <strong>//load the "about us" page into the DOM</strong>
 $.mobile.loadPage( "about/us.html" );
 
-<strong>//load a "search results" page, using data from a form with an ID of "search"" 	</strong>
+<strong>//load a "search results" page, using data from a form with an id of "search"</strong>
 $.mobile.loadPage( "searchresults.php", {
 	type: "post",
 	data: $("form#search").serialize()
@@ -184,7 +185,7 @@ $.mobile.loadPage( "searchresults.php", {
 			</dd>
 
 			<dt><code>$.mobile.loading</code> (<em>method</em>)</dt>
-			<dd>Show or hide the page loading message, which is configurable via <code>$.mobile.loader</code> prototype options as described in the <a href="../docs/pages/loader.html">widget docs</a> or can be controlled via a params object.</dd>
+			<dd>Show or hide the page loading message, which is configurable via <code>$.mobile.loader</code> prototype options as described in the <a href="../pages/loader.html">widget docs</a> or can be controlled via a params object.</dd>
 			<dd>
 				<dl>
 					<dt><code>&#183;</code> Object Param Arguments</dt>

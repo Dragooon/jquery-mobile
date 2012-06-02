@@ -2,7 +2,8 @@
 //>>description: Applies button styling to links
 //>>label: Buttons: Link-based
 //>>group: Forms
-//>>css: ../css/themes/default/jquery.mobile.theme.css, ../css/structure/jquery.mobile.button.css
+//>>css.structure: ../css/structure/jquery.mobile.button.css
+//>>css.theme: ../css/themes/default/jquery.mobile.theme.css
 
 define( [ "jquery", "./jquery.mobile.core", "./jquery.mobile.vmouse" ], function( $ ) {
 //>>excludeEnd("jqmBuildExclude");
@@ -70,20 +71,18 @@ $.fn.buttonMarkup = function( options ) {
 		}		
 
 		buttonClass = "ui-btn ui-btn-up-" + o.theme;
-		buttonClass += o.inline ? " ui-btn-inline" : "";
 		buttonClass += o.shadow ? " ui-shadow" : "";
 		buttonClass += o.corners ? " ui-btn-corner-all" : "";
 
 		if ( o.mini !== undefined ) {
 			// Used to control styling in headers/footers, where buttons default to `mini` style.
-			buttonClass += o.mini ? " ui-mini" : " ui-fullsize";
+			buttonClass += o.mini === true ? " ui-mini" : " ui-fullsize";
 		}
 		
 		if ( o.inline !== undefined ) {			
-			// Used to control styling in headers/footers, where buttons default to `mini` style.
-			buttonClass += o.inline === false ? " ui-btn-block" : " ui-btn-inline";
+			// Used to control styling in headers/footers, where buttons default to `inline` style.
+			buttonClass += o.inline === true ? " ui-btn-inline" : " ui-btn-block";
 		}
-		
 		
 		if ( o.icon ) {
 			o.icon = "ui-icon-" + o.icon;
@@ -191,13 +190,15 @@ var attachEvents = function() {
 		"vmousedown vmousecancel vmouseup vmouseover vmouseout focus blur scrollstart": function( event ) {
 			var theme,
 				$btn = $( closestEnabledButton( event.target ) ),
+				isTouchEvent = event.originalEvent && /^touch/.test( event.originalEvent.type ),
 				evt = event.type;
 		
 			if ( $btn.length ) {
 				theme = $btn.attr( "data-" + $.mobile.ns + "theme" );
 		
 				if ( evt === "vmousedown" ) {
-					if ( $.support.touch ) {
+					if ( isTouchEvent ) {
+						// Use a short delay to determine if the user is scrolling before highlighting
 						hov = setTimeout(function() {
 							$btn.removeClass( "ui-btn-up-" + theme ).addClass( "ui-btn-down-" + theme );
 						}, hoverDelay );
@@ -207,7 +208,8 @@ var attachEvents = function() {
 				} else if ( evt === "vmousecancel" || evt === "vmouseup" ) {
 					$btn.removeClass( "ui-btn-down-" + theme ).addClass( "ui-btn-up-" + theme );
 				} else if ( evt === "vmouseover" || evt === "focus" ) {
-					if ( $.support.touch ) {
+					if ( isTouchEvent ) {
+						// Use a short delay to determine if the user is scrolling before highlighting
 						foc = setTimeout(function() {
 							$btn.removeClass( "ui-btn-up-" + theme ).addClass( "ui-btn-hover-" + theme );
 						}, hoverDelay );
@@ -241,7 +243,7 @@ var attachEvents = function() {
 $( document ).bind( "pagecreate create", function( e ){
 
 	$( ":jqmData(role='button'), .ui-bar > a, .ui-header > a, .ui-footer > a, .ui-bar > :jqmData(role='controlgroup') > a", e.target )
-		.not( ".ui-btn, :jqmData(role='none'), :jqmData(role='nojs')" )
+		.not( "button, input, .ui-btn, :jqmData(role='none'), :jqmData(role='nojs')" )
 		.buttonMarkup();
 });
 

@@ -2,7 +2,8 @@
 //>>description: Creates collapsible content blocks.
 //>>label: Collapsible
 //>>group: Widgets
-//>>css: ../css/themes/default/jquery.mobile.theme.css,../css/structure/jquery.mobile.collapsible.css
+//>>css.structure: ../css/structure/jquery.mobile.collapsible.css
+//>>css.theme: ../css/themes/default/jquery.mobile.theme.css
 
 define( [ "jquery", "./jquery.mobile.widget", "./jquery.mobile.buttonMarkup" ], function( $ ) {
 //>>excludeEnd("jqmBuildExclude");
@@ -27,7 +28,7 @@ $.widget( "mobile.collapsible", $.mobile.widget, {
 			collapsibleHeading = $el.children( o.heading ).first(),
 			collapsedIcon = $el.jqmData("collapsed-icon") || o.collapsedIcon,
 			expandedIcon = $el.jqmData("expanded-icon") || o.expandedIcon,
-			collapsibleContent = collapsible.wrapInner( "<div class='ui-collapsible-content'></div>" ).find( ".ui-collapsible-content" ),
+			collapsibleContent = collapsible.wrapInner( "<div class='ui-collapsible-content'></div>" ).children( ".ui-collapsible-content" ),
 			collapsibleSet = $el.closest( ":jqmData(role='collapsible-set')" ).addClass( "ui-collapsible-set" );
 
 		// Replace collapsibleHeading if it's a legend

@@ -6,7 +6,7 @@
 define( [
 	"jquery",
 	"./jquery.mobile.core",
-	"./jquery.mobile.event",
+	"./jquery.mobile.events",
 	"../external/requirejs/depend!./jquery.hashchange[jquery]",
 	"./jquery.mobile.page",
 	"./jquery.mobile.transition" ], function( $ ) {
@@ -168,7 +168,8 @@ define( [
 				} else if ( path.isSameDomain( u, documentBase ) ) {
 					return u.hrefNoHash.replace( documentBase.domain, "" );
 				}
-				return absUrl;
+
+				return window.decodeURIComponent(absUrl);
 			},
 
 			//get path from current hash, or from a file path
@@ -209,6 +210,10 @@ define( [
 			//remove the preceding hash, any query params, and dialog notations
 			cleanHash: function( hash ) {
 				return path.stripHash( hash.replace( /\?.*$/, "" ).replace( dialogHashKey, "" ) );
+			},
+
+			isHashValid: function( hash ) {
+				return /^#[^#]+$/.test(hash);
 			},
 
 			//check whether a url is referencing the same domain, or an external domain or different protocol
@@ -303,7 +308,7 @@ define( [
 			directHashChange: function( opts ) {
 				var back , forward, newActiveIndex, prev = this.getActive();
 
-				// check if url isp in history and if it's ahead or behind current page
+				// check if url is in history and if it's ahead or behind current page
 				$.each( urlHistory.stack, function( i, historyEntry ) {
 
 					//if the url is in the stack, it's a forward or a back
@@ -492,7 +497,7 @@ define( [
 		$.mobile.hidePageLoadingMsg();
 
 		transition = $.mobile._maybeDegradeTransition( transition );
-		
+
 		//find the transition handler for the specified transition. If there
 		//isn't one in our transitionHandlers dictionary, use the default one.
 		//call the handler immediately to kick-off the transition.
@@ -772,7 +777,7 @@ define( [
 							&& RegExp.$1
 							&& dataUrlRegex.test( RegExp.$1 )
 							&& RegExp.$1 ) {
-						url = fileUrl = path.getFilePath( RegExp.$1 );
+						url = fileUrl = path.getFilePath( $( "<div>" + RegExp.$1 + "</div>" ).text() );
 					}
 
 					if ( base ) {
@@ -1423,6 +1428,29 @@ define( [
 				//transition is false if it's the first page, undefined otherwise (and may be overridden by default)
 				transition = $.mobile.urlHistory.stack.length === 0 ? "none" : undefined,
 
+				activeEntryHasHashKey = ( ( urlHistory.getActive() || { url: "" } ).url.indexOf( $.mobile.dialogHashKey ) > -1 ),
+				activePageIsDialog = ( $.mobile.activePage ? $.mobile.activePage.is( ".ui-dialog" ) : false ),
+
+				// Definition of the corner case where the initial page has a dialog hash key and we're going to it
+				dstIsDialogHashInitialPage =
+					( urlHistory.activeIndex === 1 &&
+					  urlHistory.firstVisitedPageHasDialogHash &&
+					  // Does the hash point to the first page? There are two ways that it can:
+					  // 1. When the initial page URL has the form:
+					  // http://domain/path/to/file.html#&ui-state=dialog
+					  ( to === $.mobile.dialogHashKey ||
+					  // 2. When the initial page URL has the form:
+					  // http://domain/path/to/file.html#/path/to/another/file.html#&ui-state=dialog
+					    to.replace( $.mobile.dialogHashKey, "" ) === ( urlHistory.stack[0] || { url: "" } ).url ) ),
+
+				// Decide whether we need to apply the special logic that deals with dialogs
+				specialCaseForDialogs =
+					dstIsDialogHashInitialPage
+						// Decide for the corner case where the initial page has a dialog hash in the URL
+						? ( activeEntryHasHashKey && !activePageIsDialog )
+						// Decide for the general case
+						: ( urlHistory.stack.length > 1 && to.indexOf( $.mobile.dialogHashKey ) > -1 ),
+
 				// default options for the changPage calls made after examining the current state
 				// of the page and the hash
 				changePageOptions = {
@@ -1431,6 +1459,11 @@ define( [
 					fromHashChange: true
 				};
 
+			// Record the fact that the first visited page has a dialogHashKey
+			if ( urlHistory.stack.length === 0 && to.indexOf( dialogHashKey ) > -1 ) {
+				urlHistory.firstVisitedPageHasDialogHash = true;
+			}
+
 			//if listening is disabled (either globally or temporarily), or it's a dialog hash
 			if( !$.mobile.hashListeningEnabled || urlHistory.ignoreNextHashChange ) {
 				urlHistory.ignoreNextHashChange = false;
@@ -1438,22 +1471,9 @@ define( [
 			}
 
 			// special case for dialogs
-			if( urlHistory.stack.length > 1 && to.indexOf( dialogHashKey ) > -1 ) {
+			if( specialCaseForDialogs ) {
 
-				// If current active page is not a dialog skip the dialog and continue
-				// in the same direction
-				if(!$.mobile.activePage.is( ".ui-dialog" )) {
-					//determine if we're heading forward or backward and continue accordingly past
-					//the current dialog
-					urlHistory.directHashChange({
-						currentUrl: to,
-						isBack: function() { window.history.back(); },
-						isForward: function() { window.history.forward(); }
-					});
-
-					// prevent changePage()
-					return;
-				} else {
+				if( activePageIsDialog ) {
 					// if the current active page is a dialog and we're navigating
 					// to a dialog use the dialog objected saved in the stack
 					urlHistory.directHashChange({
@@ -1475,6 +1495,26 @@ define( [
 							});
 						}
 					});
+				}
+				// If current active page is not a dialog skip the dialog and continue
+				// in the same direction
+				else {
+					//determine if we're heading forward or backward and continue accordingly past
+					//the current dialog
+
+					if ( dstIsDialogHashInitialPage ) {
+						urlHistory.activeIndex = 0;
+					}
+					else {
+						urlHistory.directHashChange({
+							currentUrl: to,
+							isBack: function() { window.history.back(); },
+							isForward: function() { window.history.forward(); }
+						});
+					}
+
+					// prevent changePage()
+					return;
 				}
 			}
 
